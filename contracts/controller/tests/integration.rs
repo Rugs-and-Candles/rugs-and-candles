@@ -1,4 +1,4 @@
-use my_adapter::{
+use controller::{
     contract::interface::MyAdapterInterface,
     msg::{ConfigResponse, ExecuteMsg, MyAdapterInstantiateMsg, MyAdapterQueryMsgFns},
     MyAdapterExecuteMsg, MY_ADAPTER_ID, MY_NAMESPACE,
@@ -80,7 +80,7 @@ fn update_config() -> anyhow::Result<()> {
     )?;
 
     let config = adapter.config()?;
-    let expected_response = my_adapter::msg::ConfigResponse {};
+    let expected_response = controller::msg::ConfigResponse {};
     assert_eq!(config, expected_response);
 
     // Adapter installed on sub-account of the publisher so this should error

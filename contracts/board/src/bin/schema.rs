@@ -1,5 +1,5 @@
 use cosmwasm_schema::remove_schemas;
-use my_adapter::contract::MyAdapter;
+use controller::contract::MyAdapter;
 use std::env::current_dir;
 use std::fs::create_dir_all;
 

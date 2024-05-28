@@ -7,7 +7,7 @@
 //! ```bash
 //! $ just publish uni-6 osmo-test-5
 //! ```
-use my_adapter::{
+use controller::{
     contract::interface::MyAdapterInterface, msg::MyAdapterInstantiateMsg, MY_ADAPTER_ID,
 };
 
