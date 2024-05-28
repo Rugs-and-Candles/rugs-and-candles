@@ -6,3 +6,4 @@ pub struct Config {}
 
 pub const CONFIG: Item<Config> = Item::new("config");
 pub const STATUS: Map<&AccountId, String> = Map::new("status");
+

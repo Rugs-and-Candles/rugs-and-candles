@@ -1,5 +1,5 @@
 [package]
-name = "cw-controller"
+name = "controller"
 version = "0.0.1"
 authors = [
   "0xstepit",
@@ -65,6 +65,6 @@ dotenv = { workspace = true, optional = true }
 env_logger = { workspace = true, optional = true }
 
 [dev-dependencies]
-my-adapter = { workspace = true }
+board = { workspace = true }
 abstract-client = { workspace = true }
 abstract-adapter = { workspace = true, features = ["test-utils"] }
