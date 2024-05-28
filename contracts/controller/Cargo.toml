@@ -1,10 +1,10 @@
 [package]
-name = "my-app"
+name = "cw-controller"
 version = "0.0.1"
 authors = [
-  "CyberHoward <cyberhoward@protonmail.com>",
-  "Adair <adair@abstract.money>",
-  "Abstract Money <contact@abstract.money>",
+  "0xstepit",
+  "MbBrainz",
+  "clydedevv"
 ]
 edition = "2021"
 homepage = ""
@@ -41,7 +41,7 @@ daemon-bin = [
   "dep:dotenv",
   "dep:env_logger",
 ]
-schema = ["abstract-app/schema"]
+schema = ["abstract-adapter/schema"]
 
 [dependencies]
 cosmwasm-std = { workspace = true }
@@ -51,7 +51,7 @@ cw-storage-plus = { workspace = true }
 thiserror = { workspace = true }
 schemars = { workspace = true }
 cw-asset = { workspace = true }
-abstract-app = { workspace = true }
+abstract-adapter = { workspace = true }
 const_format = { workspace = true }
 
 # Dependencies for interface
@@ -65,6 +65,6 @@ dotenv = { workspace = true, optional = true }
 env_logger = { workspace = true, optional = true }
 
 [dev-dependencies]
-my-app = { workspace = true }
+my-adapter = { workspace = true }
 abstract-client = { workspace = true }
-abstract-app = { workspace = true, features = ["test-utils"] }
+abstract-adapter = { workspace = true, features = ["test-utils"] }

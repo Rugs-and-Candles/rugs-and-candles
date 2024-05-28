@@ -1,10 +1,10 @@
 [package]
-name = "my-adapter"
+name = "cw-board"
 version = "0.0.1"
 authors = [
-  "CyberHoward <cyberhoward@protonmail.com>",
-  "Adair <adair@abstract.money>",
-  "Abstract Money <contact@abstract.money>",
+  "0xstepit",
+  "MbBrainz",
+  "clydedevv"
 ]
 edition = "2021"
 homepage = ""
