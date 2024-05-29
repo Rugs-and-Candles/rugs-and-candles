@@ -1,12 +1,8 @@
 use abstract_adapter::std::adapter::AdapterRequestMsg;
 use abstract_interchain_tests::setup::ibc_connect_abstract;
-use abstract_interface::ManagerExecFns;
-use board::{
-    BoardExecuteMsgFns, BoardInstantiateMsg, BoardInterface, TileAction, RUGS_N_CANDLES_NAMESPACE,
-};
+use board::{BoardInstantiateMsg, BoardInterface, TileAction, RUGS_N_CANDLES_NAMESPACE};
 use common::controller::{
-    ConfigResponse, ControllerExecuteMsg, ControllerExecuteMsgFns, ControllerInstantiateMsg,
-    ControllerQueryMsgFns,
+    ConfigResponse, ControllerExecuteMsg, ControllerInstantiateMsg, ControllerQueryMsgFns,
 };
 
 use abstract_adapter::std::objects::namespace::Namespace;
@@ -77,6 +73,7 @@ impl TestEnv<MockBech32> {
             .install_on_sub_account(false)
             .build()?;
         abstract_account.install_adapter::<ControllerInterface<_>>(&[])?;
+        println!("Installation of Controller completed");
         let tx_result = abstract_account.as_ref().manager.execute_on_module(
             CONTROLLER_ID,
             common::controller::ExecuteMsg::Module(AdapterRequestMsg {

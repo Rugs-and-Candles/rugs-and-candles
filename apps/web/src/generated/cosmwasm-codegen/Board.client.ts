@@ -6,9 +6,9 @@
 
 import { CamelCasedProperties } from "type-fest";
 import { SigningCosmWasmClient, ExecuteResult } from "@abstract-money/cli/cosmjs";
-import { AbstractQueryClient, AbstractAccountQueryClient, AbstractAccountClient, AppExecuteMsg, AppExecuteMsgFactory, AbstractClient, AbstractAccountId } from "@abstract-money/core/legacy";
+import { AbstractQueryClient, AbstractAccountQueryClient, AbstractAccountClient, AbstractClient, AbstractAccountId } from "@abstract-money/core/legacy";
 import { StdFee, Coin } from "@abstract-money/cli/cosmjs";
-import { InstantiateMsg, ExecuteMsg, QueryMsg, AccountTrace, ChainName, AccountId, MigrateMsg, ConfigResponse, StatusResponse, UserPositionResponse } from "./Board.types";
+import { ExecuteMsg, QueryMsg, ConfigResponse, StatusResponse, UserPositionResponse } from "./Board.types";
 import { BoardQueryMsgBuilder, BoardExecuteMsgBuilder } from "./Board.message-builder";
 export interface IBoardAppQueryClient {
   moduleId: string;

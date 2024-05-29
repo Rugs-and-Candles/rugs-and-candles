@@ -28,15 +28,11 @@ pub fn instantiate_handler(
 
     CONFIG.save(deps.storage, &config)?;
 
-    let tiles_map: HashMap<_, _> = msg
-        .tiles_actions
-        .into_iter()
-        .map(|(key, value)| (key, value))
-        .collect();
+    let tiles_map: HashMap<_, _> = msg.tiles_actions.into_iter().collect();
 
     for i in 0..msg.tiles_number {
         match tiles_map.get(&i) {
-            Some(action) => TILES.save(deps.storage, i, &action)?,
+            Some(action) => TILES.save(deps.storage, i, action)?,
             None => TILES.save(deps.storage, i, &TileAction::Action { action: None })?,
         }
     }

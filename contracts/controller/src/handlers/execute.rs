@@ -1,5 +1,5 @@
 use crate::{
-    contract::AdapterResult,
+    contract::ControllerResult,
     state::{PositionRange, BOARD_IDS, CONFIG, STATUS},
 };
 
@@ -24,7 +24,7 @@ pub fn execute_handler(
     info: MessageInfo,
     adapter: Controller,
     msg: ControllerExecuteMsg,
-) -> AdapterResult {
+) -> ControllerResult {
     use ControllerExecuteMsg::*;
     match msg {
         RollDice {} => unimplemented!(),
@@ -36,7 +36,7 @@ pub fn execute_handler(
 
 /// Join allows a user to participate to the rugs and candles game. This function returns an IBC
 /// message relayed to the board adapter to start the game.
-fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> AdapterResult {
+fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> ControllerResult {
     let (chain_name, position_range) = BOARD_IDS
         .range(deps.storage, None, None, Order::Ascending)
         .next()
@@ -68,7 +68,7 @@ fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> AdapterResult {
 /// BOILERPLATE
 ///
 /// Update the configuration of the adapter
-fn update_config(deps: DepsMut, _msg_info: MessageInfo, adapter: Controller) -> AdapterResult {
+fn update_config(deps: DepsMut, _msg_info: MessageInfo, adapter: Controller) -> ControllerResult {
     // Only admin(namespace owner) can change recipient address
     let namespace = adapter
         .module_registry(deps.as_ref())?
@@ -86,7 +86,7 @@ fn update_config(deps: DepsMut, _msg_info: MessageInfo, adapter: Controller) -> 
     Ok(adapter.response("update_config"))
 }
 
-fn set_status(deps: DepsMut, adapter: Controller, status: String) -> AdapterResult {
+fn set_status(deps: DepsMut, adapter: Controller, status: String) -> ControllerResult {
     let account_registry = adapter.account_registry(deps.as_ref())?;
 
     let account_id = account_registry.account_id(adapter.target()?)?;

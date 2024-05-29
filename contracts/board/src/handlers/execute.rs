@@ -1,13 +1,12 @@
 use crate::{
     contract::BoardResult,
-    state::{TileId, CONFIG, ONGOING_ACTIONS, STATUS, TILES},
+    state::{CONFIG, ONGOING_ACTIONS, STATUS, TILES},
     BoardError,
 };
 
 use abstract_adapter::{
     objects::{module::ModuleInfo, namespace::Namespace},
-    sdk::{AccountVerification, IbcInterface, ModuleInterface, ModuleRegistryInterface},
-    std::IBC_CLIENT,
+    sdk::{AccountVerification, IbcInterface, ModuleRegistryInterface},
     traits::AbstractResponse,
 };
 use common::{
@@ -72,10 +71,20 @@ fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> Bo
     let action = TILES.load(deps.storage, user_tile)?;
 
     let msgs: Vec<CosmosMsg> = match action {
-        TileAction::Candle { n_tile } => create_ibc_proceed_user(deps.as_ref(), &adapter, &info.sender, Some(user_tile + u32::from(n_tile)))?,
-        TileAction::Rugg { n_tile } => create_ibc_proceed_user(deps.as_ref(), &adapter, &info.sender, Some(user_tile - u32::from(n_tile)))?,
+        TileAction::Candle { n_tile } => create_ibc_proceed_user(
+            deps.as_ref(),
+            &adapter,
+            &info.sender,
+            Some(user_tile + u32::from(n_tile)),
+        )?,
+        TileAction::Rugg { n_tile } => create_ibc_proceed_user(
+            deps.as_ref(),
+            &adapter,
+            &info.sender,
+            Some(user_tile - u32::from(n_tile)),
+        )?,
         TileAction::Action { action } => {
-            if let Some(action) = action {
+            if let Some(_action) = action {
                 // action.
                 // for msg in action.action_msgs {
                 //     msgs.push(adapter.execute_message(msg)?);
@@ -85,19 +94,18 @@ fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> Bo
             } else {
                 create_ibc_proceed_user(deps.as_ref(), &adapter, &info.sender, None)?
             }
-        },
+        }
     };
 
     ONGOING_ACTIONS.remove(deps.storage, &info.sender);
 
-
-
-    
-
     Ok(adapter
         .response("finish_action")
         .add_attribute("new_status", "finished")
-        .add_attribute("removed_user_from_tile", format!("{} form{}", info.sender.to_string(), user_tile.to_string()))
+        .add_attribute(
+            "removed_user_from_tile",
+            format!("{} form{}", info.sender, user_tile),
+        )
         .add_attribute("tile_id", user_tile.to_string())
         .add_messages(msgs)
         // TODO add IBC call to Controller to inform that the action is started or finished
@@ -105,18 +113,23 @@ fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> Bo
         .add_attribute("account_id", account_id.to_string()))
 }
 
-
-fn create_ibc_proceed_user(deps: Deps, adapter: &BoardAdapter, user: &Addr, n_tiles: Option<u32>) -> Result<Vec<CosmosMsg>, BoardError> {
-
+fn create_ibc_proceed_user(
+    deps: Deps,
+    adapter: &BoardAdapter,
+    user: &Addr,
+    n_tiles: Option<u32>,
+) -> Result<Vec<CosmosMsg>, BoardError> {
     let message = adapter.ibc_client(deps).module_ibc_action(
-        "neutron".to_string(), 
+        "neutron".to_string(),
         ModuleInfo::from_id_latest(CONTROLLER_ID)?,
-        &common::controller::ControllerIbcMsg::ProceedUser { client_user_address: user.to_string(), tile_number: n_tiles },
+        &common::controller::ControllerIbcMsg::ProceedUser {
+            client_user_address: user.to_string(),
+            tile_number: n_tiles,
+        },
         None,
         // Some(CallbackInfo {id: CallbackIds::RegisterConfirm.into(), msg: None})
     )?;
 
-
     Ok([message].to_vec())
-
 }
+

@@ -1,5 +1,5 @@
 use crate::{
-    contract::AdapterResult,
+    contract::ControllerResult,
     state::{CONFIG, PARTICIPANTS, STATUS},
 };
 
@@ -14,7 +14,7 @@ pub fn query_handler(
     _env: Env,
     _adapter: &Controller,
     msg: ControllerQueryMsg,
-) -> AdapterResult<Binary> {
+) -> ControllerResult<Binary> {
     use ControllerQueryMsg::*;
     match msg {
         Config {} => to_json_binary(&query_config(deps)?),

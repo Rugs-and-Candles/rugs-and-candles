@@ -1,4 +1,4 @@
-use abstract_adapter::{sdk::AbstractResponse, std::ibc::ModuleIbcMsg};
+use abstract_adapter::std::ibc::ModuleIbcMsg;
 use common::board::{BoardAdapter, BoardIbcMsg};
 use common::module_ids::CONTROLLER_ID;
 use cosmwasm_std::{from_json, Addr, DepsMut, Env, Response};
@@ -19,7 +19,6 @@ pub fn module_ibc_handler(
 
     let server_msg: BoardIbcMsg = from_json(&ibc_msg.msg)?;
 
-    
     match server_msg {
         BoardIbcMsg::RegisterAction { user, tile_number } => {
             let tile_id: TileId = tile_number;
@@ -30,10 +29,9 @@ pub fn module_ibc_handler(
 }
 
 fn handle_register_action(deps: DepsMut, user_addr: Addr, tile_id: TileId) -> BoardResult {
-    // switch 
+    // switch
     //     case RUG:
     //         new ibc rug message
-
 
     ONGOING_ACTIONS.save(deps.storage, &user_addr, &tile_id)?;
     Ok(Response::new()) // GOOD
