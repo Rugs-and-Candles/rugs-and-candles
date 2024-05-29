@@ -54,6 +54,7 @@ cw-asset = { workspace = true }
 abstract-adapter = { workspace = true }
 const_format = { workspace = true }
 common = { workspace = true }
+bech32 = "0.9.1"
 
 # Dependencies for interface
 cw-orch = { workspace = true }

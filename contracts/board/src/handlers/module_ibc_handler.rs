@@ -1,5 +1,4 @@
 use abstract_adapter::{sdk::AbstractResponse, std::ibc::ModuleIbcMsg};
-use abstract_client::Namespace;
 use common::board::{BoardAdapter, BoardIbcMsg};
 use common::module_ids::CONTROLLER_ID;
 use cosmwasm_std::{from_json, Addr, DepsMut, Env, Response};
