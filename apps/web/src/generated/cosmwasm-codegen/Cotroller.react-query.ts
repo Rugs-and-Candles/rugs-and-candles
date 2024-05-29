@@ -7,7 +7,7 @@
 import { UseQueryOptions, useQuery, useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { ExecuteResult } from "@abstract-money/cli/cosmjs";
 import { StdFee, Coin } from "@abstract-money/cli/cosmjs";
-import { InstantiateMsg, ExecuteMsg, QueryMsg, AccountTrace, ChainName, AccountId, MigrateMsg, ConfigResponse, StatusResponse } from "./Cotroller.types";
+import { InstantiateMsg, ExecuteMsg, QueryMsg, AccountTrace, ChainName, AccountId, MigrateMsg, ConfigResponse, StatusResponse, UserPositionResponse } from "./Cotroller.types";
 import { CotrollerAppQueryClient, CotrollerAppClient } from "./Cotroller.client";
 export const cotrollerQueryKeys = {
   contract: ([{
@@ -23,6 +23,10 @@ export const cotrollerQueryKeys = {
   config: (contractAddress: string | undefined, args?: Record<string, unknown>) => ([{ ...cotrollerQueryKeys.address(contractAddress)[0],
     method: "config",
     args
+  }] as const),
+  userPosition: (contractAddress: string | undefined, args?: Record<string, unknown>) => ([{ ...cotrollerQueryKeys.address(contractAddress)[0],
+    method: "user_position",
+    args
   }] as const)
 };
 export interface CotrollerReactQuery<TResponse, TData = TResponse> {
@@ -30,6 +34,21 @@ export interface CotrollerReactQuery<TResponse, TData = TResponse> {
   options?: Omit<UseQueryOptions<TResponse, Error, TData>, "'queryKey' | 'queryFn' | 'initialData'"> & {
     initialData?: undefined;
   };
+}
+export interface CotrollerUserPositionQuery<TData> extends CotrollerReactQuery<UserPositionResponse, TData> {
+  args: undefined | {
+    userAddress: string;
+  };
+}
+export function useCotrollerUserPositionQuery<TData = UserPositionResponse>({
+  client,
+  args,
+  options
+}: CotrollerUserPositionQuery<TData>) {
+  return useQuery<UserPositionResponse, Error, TData>(cotrollerQueryKeys.userPosition(client?._moduleAddress, args), () => client && args ? client.userPosition({
+    userAddress: args.userAddress
+  }) : Promise.reject(new Error("Invalid client or args")), { ...options, enabled: !!args &&  !!client && (options?.enabled != undefined ? options.enabled : true)
+  });
 }
 export interface CotrollerConfigQuery<TData> extends CotrollerReactQuery<ConfigResponse, TData> {}
 export function useCotrollerConfigQuery<TData = ConfigResponse>({

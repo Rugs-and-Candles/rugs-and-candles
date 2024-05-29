@@ -1,6 +1,5 @@
 pub mod api;
 pub mod contract;
-pub mod error;
 mod handlers;
 pub mod state;
 

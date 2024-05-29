@@ -8,7 +8,7 @@ import { CamelCasedProperties } from "type-fest";
 import { SigningCosmWasmClient, ExecuteResult } from "@abstract-money/cli/cosmjs";
 import { AbstractQueryClient, AbstractAccountQueryClient, AbstractAccountClient, AppExecuteMsg, AppExecuteMsgFactory, AbstractClient, AbstractAccountId } from "@abstract-money/core/legacy";
 import { StdFee, Coin } from "@abstract-money/cli/cosmjs";
-import { InstantiateMsg, ExecuteMsg, QueryMsg, AccountTrace, ChainName, AccountId, MigrateMsg, ConfigResponse, StatusResponse } from "./Cotroller.types";
+import { InstantiateMsg, ExecuteMsg, QueryMsg, AccountTrace, ChainName, AccountId, MigrateMsg, ConfigResponse, StatusResponse, UserPositionResponse } from "./Cotroller.types";
 import { CotrollerQueryMsgBuilder, CotrollerExecuteMsgBuilder } from "./Cotroller.message-builder";
 export interface ICotrollerAppQueryClient {
   moduleId: string;
@@ -18,6 +18,9 @@ export interface ICotrollerAppQueryClient {
     status: unknown;
   }>["status"]>) => Promise<StatusResponse>;
   config: () => Promise<ConfigResponse>;
+  userPosition: (params: CamelCasedProperties<Extract<QueryMsg, {
+    user_position: unknown;
+  }>["user_position"]>) => Promise<UserPositionResponse>;
   connectSigningClient: (signingClient: SigningCosmWasmClient, address: string) => CotrollerAppClient;
   getAddress: () => Promise<string>;
 }
@@ -48,6 +51,7 @@ export class CotrollerAppQueryClient implements ICotrollerAppQueryClient {
     this.moduleId = moduleId;
     this.status = this.status.bind(this);
     this.config = this.config.bind(this);
+    this.userPosition = this.userPosition.bind(this);
   }
 
   status = async (params: CamelCasedProperties<Extract<QueryMsg, {
@@ -57,6 +61,11 @@ export class CotrollerAppQueryClient implements ICotrollerAppQueryClient {
   };
   config = async (): Promise<ConfigResponse> => {
     return this._query(CotrollerQueryMsgBuilder.config());
+  };
+  userPosition = async (params: CamelCasedProperties<Extract<QueryMsg, {
+    user_position: unknown;
+  }>["user_position"]>): Promise<UserPositionResponse> => {
+    return this._query(CotrollerQueryMsgBuilder.userPosition(params));
   };
   getAddress = async (): Promise<string> => {
     if (!this._moduleAddress) {
@@ -83,7 +92,7 @@ export class CotrollerAppQueryClient implements ICotrollerAppQueryClient {
   _query = async (queryMsg: QueryMsg): Promise<any> => {
     return this.accountQueryClient.queryModule({
       moduleId: this.moduleId,
-      moduleType: "adapter",
+      moduleType: "app",
       queryMsg
     });
   };
@@ -142,7 +151,7 @@ export class CotrollerAppClient extends CotrollerAppQueryClient implements ICotr
     return this._execute(CotrollerExecuteMsgBuilder.rollDice(), fee, memo, _funds);
   };
   _execute = async (msg: ExecuteMsg, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
-    // const moduleMsg: AppExecuteMsg<ExecuteMsg> = AppExecuteMsgFactory.executeApp(msg);
+    const moduleMsg: AppExecuteMsg<ExecuteMsg> = AppExecuteMsgFactory.executeApp(msg);
     return await this.accountClient.abstract.client.execute(this.accountClient.sender, await this.getAddress(), moduleMsg, fee, memo, _funds);
   };
 }

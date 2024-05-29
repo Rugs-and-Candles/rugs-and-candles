@@ -5,7 +5,7 @@
 * and run the @abstract-money/ts-codegen generate command to regenerate this file.
 */
 
-import { InstantiateMsg, ExecuteMsg, QueryMsg, AccountTrace, ChainName, AccountId, MigrateMsg, ConfigResponse, StatusResponse } from "./Board.types";
+import { InstantiateMsg, ExecuteMsg, QueryMsg, AccountTrace, ChainName, AccountId, MigrateMsg, ConfigResponse, StatusResponse, UserPositionResponse } from "./Board.types";
 import { CamelCasedProperties } from "type-fest";
 export abstract class BoardExecuteMsgBuilder {
 static setStatus = ({
@@ -50,6 +50,17 @@ static status = ({
 static config = (): QueryMsg => {
   return {
     config: ({} as const)
+  };
+};
+static userPosition = ({
+  userAddress
+}: CamelCasedProperties<Extract<QueryMsg, {
+  user_position: unknown;
+}>["user_position"]>): QueryMsg => {
+  return {
+    user_position: ({
+      user_address: userAddress
+    } as const)
   };
 };
 }

@@ -22,6 +22,10 @@ export type QueryMsg = {
   };
 } | {
   config: {};
+} | {
+  user_position: {
+    user_address: string;
+  };
 };
 export type AccountTrace = "local" | {
   remote: ChainName[];
@@ -37,4 +41,7 @@ export interface MigrateMsg {
 export interface ConfigResponse {}
 export interface StatusResponse {
   status?: string | null;
+}
+export interface UserPositionResponse {
+  position?: number | null;
 }

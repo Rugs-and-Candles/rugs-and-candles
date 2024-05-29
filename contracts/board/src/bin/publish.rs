@@ -7,9 +7,8 @@
 //! ```bash
 //! $ just publish uni-6 osmo-test-5
 //! ```
-use controller::{
-    contract::interface::ControllerInterface, CONTROLLER_ID,
-};
+use common::module_ids::CONTROLLER_ID;
+use controller::contract::interface::ControllerInterface;
 
 use common::controller::ControllerInstantiateMsg;
 

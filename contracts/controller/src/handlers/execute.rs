@@ -45,7 +45,7 @@ fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> AdapterResult {
 
     let target_chain_addr_prefix = "kuji"; // TODO: to a match statement that matches the chainName to the prefix
     let target_bech32_sender =
-        any_addr_to_prefix_addr(sender.to_string(), &target_chain_addr_prefix).unwrap();
+        any_addr_to_prefix_addr(sender.to_string(), target_chain_addr_prefix).unwrap();
 
     let message = adapter.ibc_client(deps.as_ref()).module_ibc_action(
         chain_name.to_string(),

@@ -8,7 +8,7 @@ import { CamelCasedProperties } from "type-fest";
 import { SigningCosmWasmClient, ExecuteResult } from "@abstract-money/cli/cosmjs";
 import { AbstractQueryClient, AbstractAccountQueryClient, AbstractAccountClient, AppExecuteMsg, AppExecuteMsgFactory, AbstractClient, AbstractAccountId } from "@abstract-money/core/legacy";
 import { StdFee, Coin } from "@abstract-money/cli/cosmjs";
-import { InstantiateMsg, ExecuteMsg, QueryMsg, AccountTrace, ChainName, AccountId, MigrateMsg, ConfigResponse, StatusResponse } from "./Board.types";
+import { InstantiateMsg, ExecuteMsg, QueryMsg, AccountTrace, ChainName, AccountId, MigrateMsg, ConfigResponse, StatusResponse, UserPositionResponse } from "./Board.types";
 import { BoardQueryMsgBuilder, BoardExecuteMsgBuilder } from "./Board.message-builder";
 export interface IBoardAppQueryClient {
   moduleId: string;
@@ -18,6 +18,9 @@ export interface IBoardAppQueryClient {
     status: unknown;
   }>["status"]>) => Promise<StatusResponse>;
   config: () => Promise<ConfigResponse>;
+  userPosition: (params: CamelCasedProperties<Extract<QueryMsg, {
+    user_position: unknown;
+  }>["user_position"]>) => Promise<UserPositionResponse>;
   connectSigningClient: (signingClient: SigningCosmWasmClient, address: string) => BoardAppClient;
   getAddress: () => Promise<string>;
 }
@@ -48,6 +51,7 @@ export class BoardAppQueryClient implements IBoardAppQueryClient {
     this.moduleId = moduleId;
     this.status = this.status.bind(this);
     this.config = this.config.bind(this);
+    this.userPosition = this.userPosition.bind(this);
   }
 
   status = async (params: CamelCasedProperties<Extract<QueryMsg, {
@@ -57,6 +61,11 @@ export class BoardAppQueryClient implements IBoardAppQueryClient {
   };
   config = async (): Promise<ConfigResponse> => {
     return this._query(BoardQueryMsgBuilder.config());
+  };
+  userPosition = async (params: CamelCasedProperties<Extract<QueryMsg, {
+    user_position: unknown;
+  }>["user_position"]>): Promise<UserPositionResponse> => {
+    return this._query(BoardQueryMsgBuilder.userPosition(params));
   };
   getAddress = async (): Promise<string> => {
     if (!this._moduleAddress) {
@@ -142,7 +151,7 @@ export class BoardAppClient extends BoardAppQueryClient implements IBoardAppClie
     return this._execute(BoardExecuteMsgBuilder.rollDice(), fee, memo, _funds);
   };
   _execute = async (msg: ExecuteMsg, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
-    // const moduleMsg: AppExecuteMsg<ExecuteMsg> = AppExecuteMsgFactory.executeApp(msg);
+    const moduleMsg: AdapterExecuteMsg<ExecuteMsg> = AdapterExecuteMsgFactory.executeAdapter({ request: msg, proxyAddress: this.accountClient.proxyAddress });
     return await this.accountClient.abstract.client.execute(this.accountClient.sender, await this.getAddress(), moduleMsg, fee, memo, _funds);
   };
 }

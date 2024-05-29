@@ -20,6 +20,7 @@ import {
   BoardUpdateConfigMutation,
   useBoardSetStatusMutation,
   BoardSetStatusMutation,
+  useBoardUserPositionQuery,
   useBoardConfigQuery,
   useBoardStatusQuery,
 } from './cosmwasm-codegen/Board.react-query'
@@ -40,6 +41,7 @@ import {
   CotrollerUpdateConfigMutation,
   useCotrollerSetStatusMutation,
   CotrollerSetStatusMutation,
+  useCotrollerUserPositionQuery,
   useCotrollerConfigQuery,
   useCotrollerStatusQuery,
 } from './cosmwasm-codegen/Cotroller.react-query'
@@ -67,6 +69,32 @@ export const BOARD_MODULE_ID = 'rugspaceandcandles:board'
 
 export const board = {
   queries: {
+    useUserPosition: ({
+      options,
+      args,
+      ...rest
+    }: Omit<
+      Parameters<
+        typeof useBoardUserPositionQuery<BoardTypes.UserPositionResponse>
+      >[0],
+      'client'
+    > & {
+      accountId: AccountId | undefined
+      chainName: string | undefined
+    }) => {
+      const { data: boardAppQueryClient } = useAbstractModuleQueryClient({
+        moduleId: BOARD_MODULE_ID,
+        ...rest,
+        Module: BoardAppQueryClient,
+        query: { enabled: options?.enabled },
+      })
+
+      return useBoardUserPositionQuery({
+        client: boardAppQueryClient,
+        options,
+        args,
+      })
+    },
     useConfig: ({
       options,
       ...rest
@@ -362,6 +390,32 @@ export const COTROLLER_MODULE_ID = 'rugspaceandcandles:cotroller'
 
 export const cotroller = {
   queries: {
+    useUserPosition: ({
+      options,
+      args,
+      ...rest
+    }: Omit<
+      Parameters<
+        typeof useCotrollerUserPositionQuery<CotrollerTypes.UserPositionResponse>
+      >[0],
+      'client'
+    > & {
+      accountId: AccountId | undefined
+      chainName: string | undefined
+    }) => {
+      const { data: cotrollerAppQueryClient } = useAbstractModuleQueryClient({
+        moduleId: COTROLLER_MODULE_ID,
+        ...rest,
+        Module: CotrollerAppQueryClient,
+        query: { enabled: options?.enabled },
+      })
+
+      return useCotrollerUserPositionQuery({
+        client: cotrollerAppQueryClient,
+        options,
+        args,
+      })
+    },
     useConfig: ({
       options,
       ...rest

@@ -49,8 +49,13 @@ fn main() -> anyhow::Result<()> {
     );
 
     // Publish the Adapter to the Abstract Platform
-    publisher
-        .publish_adapter::<BoardInstantiateMsg, BoardInterface<Daemon>>(BoardInstantiateMsg { chain: todo!(), tiles_actions: todo!(), tiles_number: todo!(), controller_address: todo!() })?;
+    publisher.publish_adapter::<BoardInstantiateMsg, BoardInterface<Daemon>>(
+        BoardInstantiateMsg {
+            chain: todo!(),
+            tiles_actions: todo!(),
+            tiles_number: todo!(),
+        },
+    )?;
 
     // Install the Adapter on a new account
 

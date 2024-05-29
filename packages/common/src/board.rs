@@ -34,27 +34,25 @@ pub struct BoardInstantiateMsg {
     pub tiles_actions: Vec<(u32, TileAction)>,
     /// Number of tiles associated with this chain.
     pub tiles_number: u32,
-    /// Controller addres
-    pub controller_address: String,
 }
 
-    /// Adapter execute messages
-    #[cosmwasm_schema::cw_serde]
-    #[derive(cw_orch::ExecuteFns)]
-    #[impl_into(ExecuteMsg)]
-    pub enum BoardExecuteMsg {
-        /// Set status of your account
-        SetStatus {
-            status: String,
-        },
-        /// Admin method: Update the configuration of the adapter
-        UpdateConfig {},
-        // RegisterAction {
-        //     user: String,
-        //     tile_number: u32,
-        // },
-        PerformAction {},
-    }
+/// Adapter execute messages
+#[cosmwasm_schema::cw_serde]
+#[derive(cw_orch::ExecuteFns)]
+#[impl_into(ExecuteMsg)]
+pub enum BoardExecuteMsg {
+    /// Set status of your account
+    SetStatus {
+        status: String,
+    },
+    /// Admin method: Update the configuration of the adapter
+    UpdateConfig {},
+    // RegisterAction {
+    //     user: String,
+    //     tile_number: u32,
+    // },
+    PerformAction {},
+}
 
 /// Adapter query messages
 #[cosmwasm_schema::cw_serde]

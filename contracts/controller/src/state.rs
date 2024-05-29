@@ -1,6 +1,6 @@
 use abstract_adapter::objects::{chain_name::ChainName, AccountId};
 use cosmwasm_std::Addr;
-use cw_storage_plus::{IndexedMap, Item, Map};
+use cw_storage_plus::{Item, Map};
 
 /// General configuration of the controller contract.
 #[cosmwasm_schema::cw_serde]
@@ -30,6 +30,7 @@ pub type BoardId = ChainName;
 /// Stores the tiles associated to every chain in which a board is present.
 pub const BOARD_IDS: Map<&BoardId, PositionRange> = Map::new("board_ids");
 
+/// Create a new position range.
 impl PositionRange {
     pub fn new(start: Position, end: Position) -> Self {
         Self(start, end)

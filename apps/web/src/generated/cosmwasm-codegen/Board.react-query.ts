@@ -7,7 +7,7 @@
 import { UseQueryOptions, useQuery, useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { ExecuteResult } from "@abstract-money/cli/cosmjs";
 import { StdFee, Coin } from "@abstract-money/cli/cosmjs";
-import { InstantiateMsg, ExecuteMsg, QueryMsg, AccountTrace, ChainName, AccountId, MigrateMsg, ConfigResponse, StatusResponse } from "./Board.types";
+import { InstantiateMsg, ExecuteMsg, QueryMsg, AccountTrace, ChainName, AccountId, MigrateMsg, ConfigResponse, StatusResponse, UserPositionResponse } from "./Board.types";
 import { BoardAppQueryClient, BoardAppClient } from "./Board.client";
 export const boardQueryKeys = {
   contract: ([{
@@ -23,6 +23,10 @@ export const boardQueryKeys = {
   config: (contractAddress: string | undefined, args?: Record<string, unknown>) => ([{ ...boardQueryKeys.address(contractAddress)[0],
     method: "config",
     args
+  }] as const),
+  userPosition: (contractAddress: string | undefined, args?: Record<string, unknown>) => ([{ ...boardQueryKeys.address(contractAddress)[0],
+    method: "user_position",
+    args
   }] as const)
 };
 export interface BoardReactQuery<TResponse, TData = TResponse> {
@@ -30,6 +34,21 @@ export interface BoardReactQuery<TResponse, TData = TResponse> {
   options?: Omit<UseQueryOptions<TResponse, Error, TData>, "'queryKey' | 'queryFn' | 'initialData'"> & {
     initialData?: undefined;
   };
+}
+export interface BoardUserPositionQuery<TData> extends BoardReactQuery<UserPositionResponse, TData> {
+  args: undefined | {
+    userAddress: string;
+  };
+}
+export function useBoardUserPositionQuery<TData = UserPositionResponse>({
+  client,
+  args,
+  options
+}: BoardUserPositionQuery<TData>) {
+  return useQuery<UserPositionResponse, Error, TData>(boardQueryKeys.userPosition(client?._moduleAddress, args), () => client && args ? client.userPosition({
+    userAddress: args.userAddress
+  }) : Promise.reject(new Error("Invalid client or args")), { ...options, enabled: !!args &&  !!client && (options?.enabled != undefined ? options.enabled : true)
+  });
 }
 export interface BoardConfigQuery<TData> extends BoardReactQuery<ConfigResponse, TData> {}
 export function useBoardConfigQuery<TData = ConfigResponse>({
