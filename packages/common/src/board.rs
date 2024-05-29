@@ -12,9 +12,16 @@ abstract_adapter::adapter_msg_types!(BoardAdapter, BoardExecuteMsg, BoardQueryMs
 
 #[cosmwasm_schema::cw_serde]
 pub struct RequiredAction {
-    required_funds: Vec<Coin>,
-    action_msgs: Vec<String>,
+    pub required_funds: Vec<Coin>,
+    pub actions: Vec<ActionType>,
 }
+
+/// The action that can be performed on a tile
+#[cosmwasm_schema::cw_serde]
+pub enum ActionType {
+    Lend,
+}
+
 
 #[cosmwasm_schema::cw_serde]
 pub enum TileAction {
@@ -51,6 +58,7 @@ pub enum BoardExecuteMsg {
     //     user: String,
     //     tile_number: u32,
     // },
+    #[payable]
     PerformAction {},
 }
 

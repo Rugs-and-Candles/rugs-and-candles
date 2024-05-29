@@ -59,12 +59,14 @@ common      = { path = "../../packages/common" }
 cw-orch = { workspace = true }
 abstract-interface = { workspace = true }
 controller = { workspace = true }
+abstract-money-market-adapter ={ workspace = true }
 
 # Dependencies for bins
 clap = { workspace = true, optional = true, features = ["derive"] }
 abstract-client = { workspace = true, optional = true }
 dotenv = { workspace = true, optional = true }
 env_logger = { workspace = true, optional = true }
+
 
 [dev-dependencies]
 abstract-interchain-tests = "0.22.1"

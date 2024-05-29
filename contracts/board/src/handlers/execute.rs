@@ -4,17 +4,20 @@ use crate::{
     BoardError,
 };
 
+use abstract_adapter::traits::AbstractNameService;
 use abstract_adapter::{
     objects::{module::ModuleInfo, namespace::Namespace},
-    sdk::{AccountVerification, IbcInterface, ModuleInterface, ModuleRegistryInterface},
+    sdk::{AccountVerification, Bank, IbcInterface, ModuleInterface, ModuleRegistryInterface, TransferInterface},
     std::IBC_CLIENT,
     traits::AbstractResponse,
 };
+use abstract_money_market_adapter::api::MoneyMarketInterface;
 use common::{
-    board::{BoardAdapter, BoardExecuteMsg, TileAction},
+    board::{ActionType, BoardAdapter, BoardExecuteMsg, TileAction},
     module_ids::{CONTROLLER_ID, RUGS_N_CANDLES_NAMESPACE},
 };
-use cosmwasm_std::{ensure_eq, Addr, CosmosMsg, Deps, DepsMut, Env, MessageInfo};
+use cosmwasm_std::{ensure_eq, Addr, Coin, CosmosMsg, Deps, DepsMut, Env, MessageInfo, StdError};
+use cw_asset::AssetBase;
 
 pub fn execute_handler(
     deps: DepsMut,
@@ -69,19 +72,21 @@ fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> Bo
     STATUS.save(deps.storage, &account_id, &"finished".to_string())?;
 
     let user_tile = ONGOING_ACTIONS.load(deps.storage, &info.sender)?;
-    let action = TILES.load(deps.storage, user_tile)?;
+    let tile_action = TILES.load(deps.storage, user_tile)?;
 
-    let msgs: Vec<CosmosMsg> = match action {
+    let msgs: Vec<CosmosMsg> = match tile_action {
         TileAction::Candle { n_tile } => create_ibc_proceed_user(deps.as_ref(), &adapter, &info.sender, Some(user_tile + u32::from(n_tile)))?,
         TileAction::Rugg { n_tile } => create_ibc_proceed_user(deps.as_ref(), &adapter, &info.sender, Some(user_tile - u32::from(n_tile)))?,
         TileAction::Action { action } => {
             if let Some(action) = action {
-                // action.
-                // for msg in action.action_msgs {
-                //     msgs.push(adapter.execute_message(msg)?);
-                // }
-                // msgs
-                todo!()
+                let required_funds = action.required_funds;
+                let action_type = action.actions.get(0).unwrap();
+
+
+
+                match action_type {
+                    ActionType::Lend => create_lending_message(deps.as_ref(), &adapter, &info.sender, required_funds, info.funds)?,
+                }
             } else {
                 create_ibc_proceed_user(deps.as_ref(), &adapter, &info.sender, None)?
             }
@@ -89,10 +94,6 @@ fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> Bo
     };
 
     ONGOING_ACTIONS.remove(deps.storage, &info.sender);
-
-
-
-    
 
     Ok(adapter
         .response("finish_action")
@@ -107,16 +108,35 @@ fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> Bo
 
 
 fn create_ibc_proceed_user(deps: Deps, adapter: &BoardAdapter, user: &Addr, n_tiles: Option<u32>) -> Result<Vec<CosmosMsg>, BoardError> {
-
     let message = adapter.ibc_client(deps).module_ibc_action(
         "neutron".to_string(), 
         ModuleInfo::from_id_latest(CONTROLLER_ID)?,
         &common::controller::ControllerIbcMsg::ProceedUser { client_user_address: user.to_string(), tile_number: n_tiles },
         None,
-        // Some(CallbackInfo {id: CallbackIds::RegisterConfirm.into(), msg: None})
     )?;
-
-
     Ok([message].to_vec())
 
+}
+
+fn create_lending_message(deps: Deps, adapter: &BoardAdapter, user: &Addr, required_funds: Vec<Coin>, added_funds: Vec<Coin>) -> Result<Vec<CosmosMsg>, BoardError> {
+    if required_funds.len() > 1 || required_funds.len() == 0{
+        return Err(BoardError::Std(StdError::generic_err("Only one fund is supported")));
+    }
+
+    if required_funds.eq(&added_funds) {
+        return Err(BoardError::Std(StdError::generic_err("The required funds are already added")));
+    }
+
+    let first_fund = required_funds.get(0).unwrap().clone();
+
+    let asset = AssetBase::native(first_fund.denom, first_fund.amount);
+    let ans_asset = adapter.name_service(deps).query(&asset)?;
+
+
+    let money_market_name = "ghost".to_string();
+    let money_market = adapter.ans_money_market(deps, money_market_name);
+    // TODO: add the users funds to the money market deposit message 
+    let deposit_msg = money_market.deposit(ans_asset).unwrap();
+
+    Ok([deposit_msg].to_vec())
 }
