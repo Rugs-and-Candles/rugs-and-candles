@@ -58,3 +58,35 @@ fn set_status(deps: DepsMut, adapter: BoardAdapter, status: String) -> AdapterRe
         .add_attribute("new_status", &status)
         .add_attribute("account_id", account_id.to_string()))
 }
+
+fn start_action(deps: DepsMut, adapter: BoardAdapter) -> AdapterResult {
+    let account_registry = adapter.account_registry(deps.as_ref())?;
+
+    let account_id = account_registry.account_id(adapter.target()?)?;
+    STATUS.save(deps.storage, &account_id, "started")?;
+
+    // TODO: Implement this
+
+    Ok(adapter
+        .response("start_action")
+        .add_attribute("new_status", "started")
+        // TODO: add success IBC aknowledgement to inform controller
+        .add_attribute("account_id", account_id.to_string()))
+}
+
+fn finish_action(deps: DepsMut, adapter: BoardAdapter) -> AdapterResult {
+    let account_registry = adapter.account_registry(deps.as_ref())?;
+
+    let account_id = account_registry.account_id(adapter.target()?)?;
+    STATUS.save(deps.storage, &account_id, "finished")?;
+
+    Ok(
+        adapter
+            .response("finish_action")
+            .add_attribute("new_status", "finished")
+            // TODO add IBC call to Controller to inform that the action is started or finished
+            .add_attribute("account_id", account_id.to_string()),
+    )
+}
+
+    
