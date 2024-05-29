@@ -31,7 +31,10 @@ pub enum BoardExecuteMsg {
     },
     /// Admin method: Update the configuration of the adapter
     UpdateConfig {},
-    StartAction {},
+    StartAction {
+        user: String,
+        tile_number: u32,
+    },
     FinishAction {},
 }
 

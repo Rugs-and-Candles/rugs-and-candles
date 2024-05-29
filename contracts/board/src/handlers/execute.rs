@@ -1,7 +1,7 @@
 use crate::{
     contract::{AdapterResult, BoardAdapter},
     msg::BoardExecuteMsg,
-    state::{CONFIG, STATUS},
+    state::{TileId, CONFIG, ONGOING_ACTIONS, STATUS},
     BoardError, BOARD_NAMESPACE,
 };
 
@@ -10,7 +10,7 @@ use abstract_adapter::{
     sdk::{AccountVerification, ModuleRegistryInterface},
     traits::AbstractResponse,
 };
-use cosmwasm_std::{ensure_eq, DepsMut, Env, MessageInfo};
+use cosmwasm_std::{ensure_eq, Addr, DepsMut, Env, MessageInfo};
 
 pub fn execute_handler(
     deps: DepsMut,
@@ -23,8 +23,8 @@ pub fn execute_handler(
     match msg {
         UpdateConfig {} => update_config(deps, info, adapter),
         SetStatus { status } => set_status(deps, adapter, status),
-        StartAction {} => unimplemented!(),
-        FinishAction {} => unimplemented!(),
+        StartAction { user, tile_number } => start_action(deps, adapter, user, tile_number),
+        FinishAction {} => finish_action(deps, info, adapter),
     }
 }
 
@@ -59,13 +59,22 @@ fn set_status(deps: DepsMut, adapter: BoardAdapter, status: String) -> AdapterRe
         .add_attribute("account_id", account_id.to_string()))
 }
 
-fn start_action(deps: DepsMut, adapter: BoardAdapter) -> AdapterResult {
+/// Allows the controller to start an action for a user.
+fn start_action(
+    deps: DepsMut,
+    adapter: BoardAdapter,
+    user: String,
+    tile_number: u32,
+) -> AdapterResult {
     let account_registry = adapter.account_registry(deps.as_ref())?;
 
     let account_id = account_registry.account_id(adapter.target()?)?;
     STATUS.save(deps.storage, &account_id, "started")?;
 
     // TODO: Implement this
+    let user_addr = Addr::unchecked(user);
+    let tile_id: TileId = tile_number;
+    ONGOING_ACTIONS.save(deps.storage, &user_addr, &tile_id)?;
 
     Ok(adapter
         .response("start_action")
@@ -74,19 +83,16 @@ fn start_action(deps: DepsMut, adapter: BoardAdapter) -> AdapterResult {
         .add_attribute("account_id", account_id.to_string()))
 }
 
-fn finish_action(deps: DepsMut, adapter: BoardAdapter) -> AdapterResult {
+fn finish_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> AdapterResult {
     let account_registry = adapter.account_registry(deps.as_ref())?;
 
     let account_id = account_registry.account_id(adapter.target()?)?;
     STATUS.save(deps.storage, &account_id, "finished")?;
 
-    Ok(
-        adapter
-            .response("finish_action")
-            .add_attribute("new_status", "finished")
-            // TODO add IBC call to Controller to inform that the action is started or finished
-            .add_attribute("account_id", account_id.to_string()),
-    )
+    Ok(adapter
+        .response("finish_action")
+        .add_attribute("new_status", "finished")
+        // TODO add IBC call to Controller to inform that the action is started or finished
+        .add_attribute("account_id", account_id.to_string()))
 }
 
-    
