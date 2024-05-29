@@ -90,3 +90,9 @@ pub struct OngoingActionResponse {}
 pub enum BoardIbcMsg {
     RegisterAction { user: String, tile_number: u32 },
 }
+
+
+#[cosmwasm_schema::cw_serde]
+pub enum BoardReplyMsg {
+    Success{ action: ActionType, addr: Addr },
+}

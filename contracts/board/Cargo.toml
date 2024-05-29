@@ -60,6 +60,7 @@ cw-orch = { workspace = true }
 abstract-interface = { workspace = true }
 controller = { workspace = true }
 abstract-money-market-adapter ={ workspace = true }
+abstract-money-market-standard ={ workspace = true }
 
 # Dependencies for bins
 clap = { workspace = true, optional = true, features = ["derive"] }
