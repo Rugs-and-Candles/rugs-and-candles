@@ -84,40 +84,12 @@ fn perform_action(
 
     let user_tile = ONGOING_ACTIONS.load(deps.storage, &info.sender)?;
     let tile_action = TILES.load(deps.storage, user_tile)?;
+    let sender = info.sender.clone();
+    let funds = info.funds.clone();
 
-    let msgs: Vec<SubMsg> = match tile_action {
-        TileAction::Candle { n_tile } => create_ibc_proceed_user(
-            deps.as_ref(),
-            &adapter,
-            &info.sender,
-            Some(user_tile + u32::from(n_tile)),
-        )?,
-        TileAction::Rugg { n_tile } => create_ibc_proceed_user(
-            deps.as_ref(),
-            &adapter,
-            &info.sender,
-            Some(user_tile - u32::from(n_tile)),
-        )?,
-        TileAction::Action { action } => {
-            if let Some(action) = action {
-                let required_funds = action.required_funds;
-                let action_type = action.actions.get(0).unwrap();
 
-                match action_type {
-                    ActionType::Lend => create_lending_message(
-                        deps.as_ref(),
-                        env,
-                        &adapter,
-                        &info.sender,
-                        required_funds,
-                        info.funds,
-                    )?,
-                }
-            } else {
-                create_ibc_proceed_user(deps.as_ref(), &adapter, &info.sender, None)?
-            }
-        }
-    };
+
+    let msgs = match_tile_action_to_message(tile_action, &deps, &adapter, &sender, funds, user_tile, env)?;
 
     ONGOING_ACTIONS.remove(deps.storage, &info.sender);
 
@@ -133,12 +105,30 @@ fn perform_action(
         .add_attribute("account_id", account_id.to_string()))
 }
 
-fn create_ibc_proceed_user(
-    deps: Deps,
-    adapter: &BoardAdapter,
-    user: &Addr,
-    n_tiles: Option<u32>,
-) -> Result<Vec<SubMsg>, BoardError> {
+pub fn match_tile_action_to_message(tile_action: TileAction, deps: &DepsMut<cw_orch::prelude::Empty>, adapter: &BoardAdapter,sender: &Addr, info_funds: Vec<Coin>, user_tile: u32, env: Env) -> Result<Vec<SubMsg>, BoardError> {
+    let msgs: Vec<SubMsg> = match tile_action {
+        TileAction::Candle { n_tile } => create_ibc_proceed_user(deps.as_ref(), adapter, sender, Some(user_tile + u32::from(n_tile)))?,
+        TileAction::Rugg { n_tile } => create_ibc_proceed_user(deps.as_ref(), adapter, sender, Some(user_tile - u32::from(n_tile)))?,
+        TileAction::Action { action } => {
+            if let Some(action) = action {
+                let required_funds = action.required_funds;
+                let action_type = action.actions.get(0).unwrap();
+
+
+
+                match action_type {
+                    ActionType::Lend => create_lending_message(deps.as_ref(), env, adapter, sender, required_funds, info_funds)?,
+                }
+            } else {
+                create_ibc_proceed_user(deps.as_ref(), adapter, sender, None)?
+            }
+        },
+    };
+    Ok(msgs)
+}
+
+
+fn create_ibc_proceed_user(deps: Deps, adapter: &BoardAdapter, user: &Addr, n_tiles: Option<u32>) -> Result<Vec<SubMsg>, BoardError> {
     let message = adapter.ibc_client(deps).module_ibc_action(
         "neutron".to_string(),
         ModuleInfo::from_id_latest(CONTROLLER_ID)?,

@@ -15,7 +15,6 @@ use common::{
 };
 use cosmwasm_std::{ensure_eq, Addr, DepsMut, Env, MessageInfo, Order, StdError};
 
-use super::bech32_converter::any_addr_to_prefix_addr;
 
 /// Main handler of the execute messages supported by the contract.
 pub fn execute_handler(
