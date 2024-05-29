@@ -1,13 +1,9 @@
-use crate::{
-    CONTROLLER_ID,
-};
-
 use abstract_adapter::sdk::{
     features::{AccountIdentification, Dependencies, ModuleIdentification},
     AbstractSdkResult, AdapterInterface,
 };
 use abstract_adapter::std::objects::module::ModuleId;
-use common::controller::{ControllerExecuteMsg, ControllerQueryMsg};
+use common::{controller::{ControllerExecuteMsg, ControllerQueryMsg}, module_ids::CONTROLLER_ID};
 use cosmwasm_schema::serde::de::DeserializeOwned;
 use cosmwasm_std::{CosmosMsg, Deps, Uint128};
 

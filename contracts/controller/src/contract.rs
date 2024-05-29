@@ -1,10 +1,11 @@
 use crate::{
     handlers,
-    CONTROLLER_ID, CONTROLLER_VERSION,
+    CONTROLLER_VERSION,
 };
 
 use common::errors::ControllerError;
 use common::controller::Controller;
+use common::module_ids::CONTROLLER_ID;
 use cosmwasm_std::Response;
 /// The type of the adapter that is used to build your Adapter and access the Abstract SDK features.
 
