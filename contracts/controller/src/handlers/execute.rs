@@ -2,16 +2,17 @@ use crate::{
     contract::{AdapterResult, Controller},
     error::ControllerError,
     msg::ControllerExecuteMsg,
-    state::{BOARD_IDS, CONFIG, STATUS},
+    state::{PositionRange, BOARD_IDS, CONFIG, STATUS},
     CONTROLLER_NAMESPACE,
 };
 
+use common::module_ids::BOARD_ID;
 use abstract_adapter::{
-    objects::namespace::Namespace,
+    objects::{module::ModuleInfo, namespace::Namespace},
     sdk::{AccountVerification, IbcInterface, ModuleRegistryInterface},
     traits::AbstractResponse,
 };
-use cosmwasm_std::{ensure_eq, Addr, DepsMut, Env, MessageInfo};
+use cosmwasm_std::{ensure_eq, Addr, DepsMut, Env, MessageInfo, Order, StdError};
 
 pub fn execute_handler(
     deps: DepsMut,
@@ -64,14 +65,20 @@ fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> AdapterResult {
     let account_registry = adapter.account_registry(deps.as_ref())?;
     let account_id = account_registry.account_id(adapter.target()?)?;
 
-    // let first_board = BOARD_IDS.iter(deps.storage).next();
 
-    // let message = adapter.ibc_client(deps.as_ref()).module_ibc_action(, target_module, exec_msg, callback_info)
-    //     &account_id,
-    //     &sender,
-    //     "Joining the game",
-    //     "Joining the game",
-    // )?;
+    let board_id_ranges = BOARD_IDS.range(deps.storage, None, None,Order::Ascending).next().ok_or(StdError::generic_err("No board found"))??;
+
+    let start_tile_id = board_id_ranges.1.start();
+
+
+
+
+    let message = adapter.ibc_client(deps.as_ref()).module_ibc_action(
+        board_id_ranges.0.to_string(), 
+        ModuleInfo::from_id_latest(BOARD_ID)?,
+
+    );
+
 
     Ok(adapter
         .response("join")
