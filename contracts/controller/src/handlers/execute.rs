@@ -1,16 +1,23 @@
 use crate::{
-    contract::{AdapterResult},
-    state::{PositionRange, BOARD_IDS, CONFIG, STATUS},
+    contract::AdapterResult,
+    state::{BOARD_IDS, CONFIG, STATUS},
 };
 
-use common::{controller::{Controller, ControllerExecuteMsg}, errors::ControllerError, module_ids::{BOARD_ID, RUGS_N_CANDLES_NAMESPACE}};
 use abstract_adapter::{
-    objects::{module::ModuleInfo, namespace::Namespace}, sdk::{AccountVerification, IbcInterface, ModuleRegistryInterface}, std::ibc::CallbackInfo, traits::AbstractResponse
+    objects::{module::ModuleInfo, namespace::Namespace},
+    sdk::{AccountVerification, IbcInterface, ModuleRegistryInterface},
+    traits::AbstractResponse,
+};
+use common::{
+    controller::{Controller, ControllerExecuteMsg},
+    errors::ControllerError,
+    module_ids::{BOARD_ID, RUGS_N_CANDLES_NAMESPACE},
 };
 use cosmwasm_std::{ensure_eq, Addr, DepsMut, Env, MessageInfo, Order, StdError};
 
-use super::{bech32_converter::any_addr_to_prefix_addr, module_ibc_handler::CallbackIds};
+use super::bech32_converter::any_addr_to_prefix_addr;
 
+/// Main handler of the execute messages supported by the contract.
 pub fn execute_handler(
     deps: DepsMut,
     _env: Env,
@@ -20,13 +27,46 @@ pub fn execute_handler(
 ) -> AdapterResult {
     use ControllerExecuteMsg::*;
     match msg {
-        UpdateConfig {} => update_config(deps, info, adapter),
-        SetStatus { status } => set_status(deps, adapter, status),
         RollDice {} => unimplemented!(),
         Join {} => join(deps, adapter, info.sender),
+        UpdateConfig {} => update_config(deps, info, adapter),
+        SetStatus { status } => set_status(deps, adapter, status),
     }
 }
 
+/// Join allows a user to participate to the rugs and candles game. This function returns an IBC
+/// message relayed to the board adapter to start the game.
+fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> AdapterResult {
+    let (chain_name, position_range) = BOARD_IDS
+        .range(deps.storage, None, None, Order::Ascending)
+        .next()
+        .ok_or(StdError::generic_err("No board found"))??;
+    let start_tile_id = position_range.start();
+
+    let target_chain_addr_prefix = "kuji"; // TODO: to a match statement that matches the chainName to the prefix
+    let target_bech32_sender =
+        any_addr_to_prefix_addr(sender.to_string(), &target_chain_addr_prefix).unwrap();
+
+    let message = adapter.ibc_client(deps.as_ref()).module_ibc_action(
+        chain_name.to_string(),
+        ModuleInfo::from_id_latest(BOARD_ID)?,
+        &common::board::BoardIbcMsg::RegisterAction {
+            user: target_bech32_sender.clone(),
+            tile_number: 0,
+        },
+        None,
+        // Some(CallbackInfo {id: CallbackIds::RegisterConfirm.into(), msg: None})
+    )?;
+
+    Ok(adapter
+        .response("join")
+        .add_attribute("start_tile_id", start_tile_id.to_string())
+        .add_attribute("target_bech32_sender", target_bech32_sender.to_string())
+        .add_message(message))
+}
+
+/// BOILERPLATE
+///
 /// Update the configuration of the adapter
 fn update_config(deps: DepsMut, _msg_info: MessageInfo, adapter: Controller) -> AdapterResult {
     // Only admin(namespace owner) can change recipient address
@@ -56,29 +96,4 @@ fn set_status(deps: DepsMut, adapter: Controller, status: String) -> AdapterResu
         .response("set_status")
         .add_attribute("new_status", &status)
         .add_attribute("account_id", account_id.to_string()))
-}
-
-fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> AdapterResult {
-    let (chain_name, position_range)= BOARD_IDS.range(deps.storage, None, None,Order::Ascending)
-        .next().ok_or(StdError::generic_err("No board found"))??;
-    let start_tile_id = position_range.start();
-
-    let target_chain_addr_prefix = "kuji"; // TODO: to a match statement that matches the chainName to the prefix
-    let target_bech32_sender = any_addr_to_prefix_addr(sender.to_string(), &target_chain_addr_prefix).unwrap();
-
-    let message = adapter.ibc_client(deps.as_ref()).module_ibc_action(
-        chain_name.to_string(), 
-        ModuleInfo::from_id_latest(BOARD_ID)?,
-        &common::board::BoardIbcMsg::RegisterAction { user: target_bech32_sender.clone(), tile_number: 0 },
-        None,
-        // Some(CallbackInfo {id: CallbackIds::RegisterConfirm.into(), msg: None})
-    )?;
-
-
-    Ok(adapter
-        .response("join")
-        .add_attribute("start_tile_id", start_tile_id.to_string())
-        .add_attribute("target_bech32_sender", target_bech32_sender.to_string())
-        .add_message(message)
-    )
 }

@@ -1,4 +1,3 @@
-
 use abstract_adapter::{objects::AccountId, AdapterContract};
 use cosmwasm_schema::QueryResponses;
 
@@ -41,6 +40,8 @@ pub enum ControllerQueryMsg {
     Status { account_id: AccountId },
     #[returns(ConfigResponse)]
     Config {},
+    #[returns(UserPositionResponse)]
+    UserPosition { user_address: String },
 }
 
 #[cosmwasm_schema::cw_serde]
@@ -52,7 +53,16 @@ pub struct StatusResponse {
 }
 
 #[cosmwasm_schema::cw_serde]
+pub struct UserPositionResponse {
+    pub position: Option<u32>,
+}
+
+#[cosmwasm_schema::cw_serde]
 pub enum ControllerIbcMsg {
-    ProceedUser { client_user_address: String, tile_number: Option<u32> },
+    ProceedUser {
+        client_user_address: String,
+        tile_number: Option<u32>,
+    },
 }
 // TODO: Build handler for this message
+
