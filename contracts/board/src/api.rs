@@ -1,6 +1,5 @@
 use crate::{
-    msg::{MyAdapterExecuteMsg, MyAdapterQueryMsg},
-    MY_ADAPTER_ID,
+    BOARD_ID,
 };
 
 use abstract_adapter::sdk::{
@@ -8,32 +7,33 @@ use abstract_adapter::sdk::{
     AbstractSdkResult, AdapterInterface,
 };
 use abstract_adapter::std::objects::module::ModuleId;
+use common::board::{BoardExecuteMsg, BoardQueryMsg};
 use cosmwasm_schema::serde::de::DeserializeOwned;
 use cosmwasm_std::{CosmosMsg, Deps, Uint128};
 
 // API for Abstract SDK users
 /// Interact with your adapter in other modules.
-pub trait MyAdapterApi: AccountIdentification + Dependencies + ModuleIdentification {
+pub trait BoardApi: AccountIdentification + Dependencies + ModuleIdentification {
     /// Construct a new adapter interface.
-    fn my_adapter<'a>(&'a self, deps: Deps<'a>) -> MyAdapter<Self> {
-        MyAdapter {
+    fn board<'a>(&'a self, deps: Deps<'a>) -> Board<Self> {
+        Board {
             base: self,
             deps,
-            module_id: MY_ADAPTER_ID,
+            module_id: BOARD_ID,
         }
     }
 }
 
-impl<T: AccountIdentification + Dependencies + ModuleIdentification> MyAdapterApi for T {}
+impl<T: AccountIdentification + Dependencies + ModuleIdentification> BoardApi for T {}
 
 #[derive(Clone)]
-pub struct MyAdapter<'a, T: MyAdapterApi> {
+pub struct Board<'a, T: BoardApi> {
     pub base: &'a T,
     pub module_id: ModuleId<'a>,
     pub deps: Deps<'a>,
 }
 
-impl<'a, T: MyAdapterApi> MyAdapter<'a, T> {
+impl<'a, T: BoardApi> Board<'a, T> {
     /// Set the module id
     pub fn with_module_id(self, module_id: ModuleId<'a>) -> Self {
         Self { module_id, ..self }
@@ -45,7 +45,7 @@ impl<'a, T: MyAdapterApi> MyAdapter<'a, T> {
     }
 
     /// Executes a [MyAdapterExecuteMsg] in the adapter
-    fn request(&self, msg: MyAdapterExecuteMsg) -> AbstractSdkResult<CosmosMsg> {
+    fn request(&self, msg: BoardExecuteMsg) -> AbstractSdkResult<CosmosMsg> {
         let adapters = self.base.adapters(self.deps);
 
         adapters.execute(self.module_id(), msg)
@@ -53,20 +53,20 @@ impl<'a, T: MyAdapterApi> MyAdapter<'a, T> {
 
     /// Route message
     pub fn update_config(&self) -> AbstractSdkResult<CosmosMsg> {
-        self.request(MyAdapterExecuteMsg::UpdateConfig {})
+        self.request(BoardExecuteMsg::UpdateConfig {})
     }
 }
 
 /// Queries
-impl<'a, T: MyAdapterApi> MyAdapter<'a, T> {
+impl<'a, T: BoardApi> Board<'a, T> {
     /// Query your adapter via message type
-    pub fn query<R: DeserializeOwned>(&self, query_msg: MyAdapterQueryMsg) -> AbstractSdkResult<R> {
+    pub fn query<R: DeserializeOwned>(&self, query_msg: BoardQueryMsg) -> AbstractSdkResult<R> {
         let adapters = self.base.adapters(self.deps);
         adapters.query(self.module_id(), query_msg)
     }
 
     /// Query config
     pub fn config(&self) -> AbstractSdkResult<Uint128> {
-        self.query(MyAdapterQueryMsg::Config {})
+        self.query(BoardQueryMsg::Config {})
     }
 }

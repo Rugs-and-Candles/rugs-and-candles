@@ -7,8 +7,9 @@
 //! ```bash
 //! $ just publish uni-6 osmo-test-5
 //! ```
-use my_adapter::{
-    contract::interface::MyAdapterInterface, msg::MyAdapterInstantiateMsg, MY_ADAPTER_ID,
+use common::controller::ControllerInstantiateMsg;
+use controller::{
+    contract::interface::ControllerInterface, CONTROLLER_ID,
 };
 
 use abstract_adapter::objects::namespace::Namespace;
@@ -26,7 +27,7 @@ fn publish(networks: Vec<ChainInfo>) -> anyhow::Result<()> {
             .chain(network)
             .build()?;
 
-        let adapter_namespace = Namespace::from_id(MY_ADAPTER_ID)?;
+        let adapter_namespace = Namespace::from_id(CONTROLLER_ID)?;
 
         // Create an [`AbstractClient`]
         let abstract_client: AbstractClient<Daemon> = AbstractClient::new(chain.clone())?;
@@ -41,8 +42,8 @@ fn publish(networks: Vec<ChainInfo>) -> anyhow::Result<()> {
         }
 
         // Publish the Adapter to the Abstract Platform
-        publisher.publish_adapter::<MyAdapterInstantiateMsg, MyAdapterInterface<Daemon>>(
-            MyAdapterInstantiateMsg {},
+        publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<Daemon>>(
+            ControllerInstantiateMsg {},
         )?;
     }
     Ok(())

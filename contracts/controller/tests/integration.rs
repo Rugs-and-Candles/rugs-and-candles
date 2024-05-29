@@ -1,7 +1,11 @@
-use my_adapter::{
-    contract::interface::MyAdapterInterface,
-    msg::{ConfigResponse, ExecuteMsg, MyAdapterInstantiateMsg, MyAdapterQueryMsgFns},
-    MyAdapterExecuteMsg, MY_ADAPTER_ID, MY_NAMESPACE,
+use common::controller::ControllerExecuteMsg;
+use common::controller::ConfigResponse;
+use common::controller::ControllerInstantiateMsg;
+use common::controller::ControllerQueryMsgFns;
+use common::controller::ExecuteMsg;
+use controller::{
+    contract::interface::ControllerInterface,
+    CONTROLLER_ID, CONTROLLER_NAMESPACE,
 };
 
 use abstract_adapter::std::{adapter::AdapterRequestMsg, objects::namespace::Namespace};
@@ -13,7 +17,7 @@ use cw_orch::{anyhow, prelude::*};
 struct TestEnv<Env: CwEnv> {
     publisher: Publisher<Env>,
     abs: AbstractClient<Env>,
-    adapter: Application<Env, MyAdapterInterface<Env>>,
+    adapter: Application<Env, ControllerInterface<Env>>,
 }
 
 impl TestEnv<MockBech32> {
@@ -23,7 +27,7 @@ impl TestEnv<MockBech32> {
         // Create a sender and mock env
         let mock = MockBech32::new("mock");
         let sender = mock.sender();
-        let namespace = Namespace::new(MY_NAMESPACE)?;
+        let namespace = Namespace::new(CONTROLLER_NAMESPACE)?;
 
         // You can set up Abstract with a builder.
         let abs_client = AbstractClient::builder(mock).build()?;
@@ -32,13 +36,13 @@ impl TestEnv<MockBech32> {
 
         // Publish the adapter
         let publisher = abs_client.publisher_builder(namespace).build()?;
-        publisher.publish_adapter::<MyAdapterInstantiateMsg, MyAdapterInterface<_>>(
-            MyAdapterInstantiateMsg {},
+        publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<_>>(
+            ControllerInstantiateMsg {},
         )?;
 
         let adapter = publisher
             .account()
-            .install_adapter::<MyAdapterInterface<_>>(&[])?;
+            .install_adapter::<ControllerInterface<_>>(&[])?;
 
         Ok(TestEnv {
             abs: abs_client,
@@ -67,20 +71,20 @@ fn update_config() -> anyhow::Result<()> {
     // Note that it's not a requirement to have it installed in this case
     let publisher_account = env
         .abs
-        .publisher_builder(Namespace::new(MY_NAMESPACE).unwrap())
+        .publisher_builder(Namespace::new(CONTROLLER_NAMESPACE).unwrap())
         .build()?;
 
     adapter.execute(
         &AdapterRequestMsg {
             proxy_address: Some(publisher_account.account().proxy()?.to_string()),
-            request: MyAdapterExecuteMsg::UpdateConfig {},
+            request: ControllerExecuteMsg::UpdateConfig {},
         }
         .into(),
         None,
     )?;
 
     let config = adapter.config()?;
-    let expected_response = my_adapter::msg::ConfigResponse {};
+    let expected_response = common::controller::ConfigResponse {};
     assert_eq!(config, expected_response);
 
     // Adapter installed on sub-account of the publisher so this should error
@@ -88,7 +92,7 @@ fn update_config() -> anyhow::Result<()> {
         .execute(
             &AdapterRequestMsg {
                 proxy_address: Some(adapter.account().proxy()?.to_string()),
-                request: MyAdapterExecuteMsg::UpdateConfig {},
+                request: ControllerExecuteMsg::UpdateConfig {},
             }
             .into(),
             None,
@@ -110,10 +114,10 @@ fn set_status() -> anyhow::Result<()> {
     let subaccount = &env.publisher.account().sub_accounts()?[0];
 
     subaccount.as_ref().manager.execute_on_module(
-        MY_ADAPTER_ID,
+        CONTROLLER_ID,
         ExecuteMsg::Module(AdapterRequestMsg {
             proxy_address: Some(subaccount.proxy()?.to_string()),
-            request: MyAdapterExecuteMsg::SetStatus {
+            request: ControllerExecuteMsg::SetStatus {
                 status: first_status.clone(),
             },
         }),
@@ -122,14 +126,14 @@ fn set_status() -> anyhow::Result<()> {
     let new_account = env
         .abs
         .account_builder()
-        .install_adapter::<MyAdapterInterface<MockBech32>>()?
+        .install_adapter::<ControllerInterface<MockBech32>>()?
         .build()?;
 
     new_account.as_ref().manager.execute_on_module(
-        MY_ADAPTER_ID,
+        CONTROLLER_ID,
         ExecuteMsg::Module(AdapterRequestMsg {
             proxy_address: Some(new_account.proxy()?.to_string()),
-            request: MyAdapterExecuteMsg::SetStatus {
+            request: ControllerExecuteMsg::SetStatus {
                 status: second_status.clone(),
             },
         }),

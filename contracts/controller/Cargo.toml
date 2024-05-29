@@ -53,6 +53,8 @@ schemars = { workspace = true }
 cw-asset = { workspace = true }
 abstract-adapter = { workspace = true }
 const_format = { workspace = true }
+common = { workspace = true }
+bech32 = "0.9.1"
 
 # Dependencies for interface
 cw-orch = { workspace = true }
@@ -65,6 +67,7 @@ dotenv = { workspace = true, optional = true }
 env_logger = { workspace = true, optional = true }
 
 [dev-dependencies]
+abstract-interchain-tests = "0.22.1"
 board = { workspace = true }
 abstract-client = { workspace = true }
 abstract-adapter = { workspace = true, features = ["test-utils"] }

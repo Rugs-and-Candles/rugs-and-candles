@@ -1,23 +1,22 @@
 use crate::{
-    contract::{AdapterResult, MyAdapter},
-    msg::{ConfigResponse, MyAdapterQueryMsg, StatusResponse},
-    state::{CONFIG, STATUS},
+    contract::BoardResult, state::{CONFIG, STATUS}
 };
 
 use abstract_adapter::objects::AccountId;
+use common::board::{BoardAdapter, BoardQueryMsg, ConfigResponse, StatusResponse};
 use cosmwasm_std::{to_json_binary, Binary, Deps, Env, StdResult};
 
 pub fn query_handler(
     deps: Deps,
     _env: Env,
-    _adapter: &MyAdapter,
-    msg: MyAdapterQueryMsg,
-) -> AdapterResult<Binary> {
+    _adapter: &BoardAdapter,
+    msg: BoardQueryMsg,
+) -> BoardResult<Binary> {
+    use BoardQueryMsg::*;
     match msg {
-        MyAdapterQueryMsg::Config {} => to_json_binary(&query_config(deps)?),
-        MyAdapterQueryMsg::Status { account_id } => {
-            to_json_binary(&query_status(deps, account_id)?)
-        }
+        Config {} => to_json_binary(&query_config(deps)?),
+        Status { account_id } => to_json_binary(&query_status(deps, account_id)?),
+        OngoingAction {} => unimplemented!(),
     }
     .map_err(Into::into)
 }

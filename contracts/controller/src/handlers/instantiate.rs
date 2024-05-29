@@ -1,17 +1,17 @@
 use crate::{
-    contract::{AdapterResult, MyAdapter},
-    msg::MyAdapterInstantiateMsg,
+    contract::{AdapterResult},
     state::{Config, CONFIG},
 };
 
+use common::controller::{Controller, ControllerInstantiateMsg};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 
 pub fn instantiate_handler(
     deps: DepsMut,
     _env: Env,
     _info: MessageInfo,
-    _adapter: MyAdapter,
-    _msg: MyAdapterInstantiateMsg,
+    _adapter: Controller,
+    _msg: ControllerInstantiateMsg,
 ) -> AdapterResult {
     let config: Config = Config {};
 
