@@ -17,6 +17,9 @@ const BOARD: BoardAdapter = BoardAdapter::new(BOARD_ID, BOARD_VERSION, None)
     .with_instantiate(handlers::instantiate_handler)
     .with_execute(handlers::execute_handler)
     .with_query(handlers::query_handler)
+    .with_replies(&[
+        (0, handlers::reply::reply_handler)
+    ])
     .with_module_ibc(handlers::module_ibc_handler);
     // .with_ibc_callbacks(&[
     //     "ReplyOnBoardUpdate", 

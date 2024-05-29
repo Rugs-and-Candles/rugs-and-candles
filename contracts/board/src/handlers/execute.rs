@@ -3,21 +3,31 @@ use crate::{
     state::{CONFIG, ONGOING_ACTIONS, STATUS, TILES},
     BoardError,
 };
+use abstract_money_market_adapter::msg::{MoneyMarketExecuteMsg, MoneyMarketQueryMsg};
 
+use abstract_adapter::traits::AbstractNameService;
 use abstract_adapter::{
     objects::{module::ModuleInfo, namespace::Namespace},
-    sdk::{AccountVerification, IbcInterface, ModuleRegistryInterface},
+    sdk::{
+        AccountVerification, Bank, IbcInterface, ModuleInterface, ModuleRegistryInterface,
+        TransferInterface,
+    },
     traits::AbstractResponse,
 };
+use abstract_money_market_adapter::api::MoneyMarketInterface;
+use abstract_money_market_standard::ans_action::MoneyMarketAnsAction;
 use common::{
-    board::{BoardAdapter, BoardExecuteMsg, TileAction},
+    board::{ActionType, BoardAdapter, BoardExecuteMsg, TileAction},
     module_ids::{CONTROLLER_ID, RUGS_N_CANDLES_NAMESPACE},
 };
-use cosmwasm_std::{ensure_eq, Addr, CosmosMsg, Deps, DepsMut, Env, MessageInfo};
+use cosmwasm_std::{
+    ensure_eq, Addr, Coin, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Reply, StdError, SubMsg,
+};
+use cw_asset::AssetBase;
 
 pub fn execute_handler(
     deps: DepsMut,
-    _env: Env,
+    env: Env,
     info: MessageInfo,
     adapter: BoardAdapter,
     msg: BoardExecuteMsg,
@@ -26,7 +36,7 @@ pub fn execute_handler(
     match msg {
         UpdateConfig {} => update_config(deps, info, adapter),
         SetStatus { status } => set_status(deps, adapter, status),
-        PerformAction {} => perform_action(deps, info, adapter),
+        PerformAction {} => perform_action(deps, info, env, adapter),
     }
 }
 
@@ -61,16 +71,21 @@ fn set_status(deps: DepsMut, adapter: BoardAdapter, status: String) -> BoardResu
         .add_attribute("account_id", account_id.to_string()))
 }
 
-fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> BoardResult {
+fn perform_action(
+    deps: DepsMut,
+    info: MessageInfo,
+    env: Env,
+    adapter: BoardAdapter,
+) -> BoardResult {
     let account_registry = adapter.account_registry(deps.as_ref())?;
 
     let account_id = account_registry.account_id(adapter.target()?)?;
     STATUS.save(deps.storage, &account_id, &"finished".to_string())?;
 
     let user_tile = ONGOING_ACTIONS.load(deps.storage, &info.sender)?;
-    let action = TILES.load(deps.storage, user_tile)?;
+    let tile_action = TILES.load(deps.storage, user_tile)?;
 
-    let msgs: Vec<CosmosMsg> = match action {
+    let msgs: Vec<SubMsg> = match tile_action {
         TileAction::Candle { n_tile } => create_ibc_proceed_user(
             deps.as_ref(),
             &adapter,
@@ -84,13 +99,20 @@ fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> Bo
             Some(user_tile - u32::from(n_tile)),
         )?,
         TileAction::Action { action } => {
-            if let Some(_action) = action {
-                // action.
-                // for msg in action.action_msgs {
-                //     msgs.push(adapter.execute_message(msg)?);
-                // }
-                // msgs
-                todo!()
+            if let Some(action) = action {
+                let required_funds = action.required_funds;
+                let action_type = action.actions.get(0).unwrap();
+
+                match action_type {
+                    ActionType::Lend => create_lending_message(
+                        deps.as_ref(),
+                        env,
+                        &adapter,
+                        &info.sender,
+                        required_funds,
+                        info.funds,
+                    )?,
+                }
             } else {
                 create_ibc_proceed_user(deps.as_ref(), &adapter, &info.sender, None)?
             }
@@ -107,7 +129,7 @@ fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> Bo
             format!("{} form{}", info.sender, user_tile),
         )
         .add_attribute("tile_id", user_tile.to_string())
-        .add_messages(msgs)
+        .add_submessages(msgs)
         // TODO add IBC call to Controller to inform that the action is started or finished
         // .add_message()
         .add_attribute("account_id", account_id.to_string()))
@@ -118,7 +140,7 @@ fn create_ibc_proceed_user(
     adapter: &BoardAdapter,
     user: &Addr,
     n_tiles: Option<u32>,
-) -> Result<Vec<CosmosMsg>, BoardError> {
+) -> Result<Vec<SubMsg>, BoardError> {
     let message = adapter.ibc_client(deps).module_ibc_action(
         "neutron".to_string(),
         ModuleInfo::from_id_latest(CONTROLLER_ID)?,
@@ -127,9 +149,48 @@ fn create_ibc_proceed_user(
             tile_number: n_tiles,
         },
         None,
-        // Some(CallbackInfo {id: CallbackIds::RegisterConfirm.into(), msg: None})
     )?;
-
-    Ok([message].to_vec())
+    Ok([SubMsg::new(message)].to_vec())
 }
 
+fn create_lending_message(
+    deps: Deps,
+    env: Env,
+    adapter: &BoardAdapter,
+    user: &Addr,
+    required_funds: Vec<Coin>,
+    added_funds: Vec<Coin>,
+) -> Result<Vec<SubMsg>, BoardError> {
+    if required_funds.len() > 1 || required_funds.len() == 0 {
+        return Err(BoardError::Std(StdError::generic_err(
+            "Only one fund is supported",
+        )));
+    }
+
+    if required_funds.eq(&added_funds) {
+        return Err(BoardError::Std(StdError::generic_err(
+            "The required funds are already added",
+        )));
+    }
+
+    let first_fund = required_funds.get(0).unwrap().clone();
+
+    let asset = AssetBase::native(first_fund.denom, first_fund.amount);
+    let ans_asset = adapter.name_service(deps).query(&asset)?;
+
+    let money_market_name = "ghost".to_string();
+    let money_market = adapter.ans_money_market(deps, money_market_name.clone());
+    // TODO: add the users funds to the money market deposit message
+    let deposit_msg: CosmosMsg = money_market.query(MoneyMarketQueryMsg::GenerateMessages {
+        message: MoneyMarketExecuteMsg::AnsAction {
+            money_market: money_market_name,
+            action: MoneyMarketAnsAction::Deposit {
+                lending_asset: ans_asset,
+            },
+        },
+        addr_as_sender: env.contract.address.to_string(),
+    })?;
+
+    let sub_msg = SubMsg::reply_on_success(deposit_msg, 0);
+    Ok([sub_msg].to_vec())
+}
