@@ -27,6 +27,9 @@ pub enum BoardError {
     #[error("{0} are not implemented")]
     NotImplemented(String),
 
+    #[error("{0} is not allowed")]
+    InvalidChain(String),
+
     #[error("Unauthorized")]
     Unauthorized {},
 }

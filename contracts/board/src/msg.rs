@@ -12,14 +12,14 @@ abstract_adapter::adapter_msg_types!(BoardAdapter, BoardExecuteMsg, BoardQueryMs
 pub struct BoardInstantiateMsg {
     /// The name of the chain in which this contract
     /// is instantiated.
-    chain: String,
+    pub chain: String,
     /// A vector containing the index of the tile and
     /// the action to perform.
-    tiles_actions: Vec<(u64, String)>,
+    pub tiles_actions: Vec<(u32, TileAction)>,
     /// Number of tiles associated with this chain.
-    tiles_number: u64,
+    pub tiles_number: u64,
     /// Controller addres
-    controller_address: String,
+    pub controller_address: String,
 }
 
 /// Adapter execute messages

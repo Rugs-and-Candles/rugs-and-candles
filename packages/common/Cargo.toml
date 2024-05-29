@@ -18,3 +18,4 @@ resolver = "2"
 [dependencies]
 cosmwasm-std = { version = "1.5.3" }
 cosmwasm-schema = { version = "1.5.3" }
+thiserror = "1.0"

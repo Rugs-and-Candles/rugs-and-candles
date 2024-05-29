@@ -53,6 +53,7 @@ schemars = { workspace = true }
 cw-asset = { workspace = true }
 abstract-adapter = { workspace = true }
 const_format = { workspace = true }
+common      = { path = "../../packages/common" }
 
 # Dependencies for interface
 cw-orch = { workspace = true }
