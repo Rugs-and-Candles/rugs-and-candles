@@ -43,25 +43,22 @@ fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> ControllerResult {
         .ok_or(StdError::generic_err("No board found"))??;
     let start_tile_id = position_range.start();
 
-    let target_chain_addr_prefix = "kuji"; // TODO: to a match statement that matches the chainName to the prefix
-    let target_bech32_sender =
-        any_addr_to_prefix_addr(sender.to_string(), target_chain_addr_prefix).unwrap();
+    let cannonical_sender = deps.api.addr_canonicalize(sender.as_str())?;
 
     let message = adapter.ibc_client(deps.as_ref()).module_ibc_action(
         chain_name.to_string(),
         ModuleInfo::from_id_latest(BOARD_ID)?,
         &common::board::BoardIbcMsg::RegisterAction {
-            user: target_bech32_sender.clone(),
+            user: cannonical_sender.clone(),
             tile_number: 0,
         },
         None,
-        // Some(CallbackInfo {id: CallbackIds::RegisterConfirm.into(), msg: None})
     )?;
 
     Ok(adapter
         .response("join")
         .add_attribute("start_tile_id", start_tile_id.to_string())
-        .add_attribute("target_bech32_sender", target_bech32_sender.to_string())
+        .add_attribute("target_bech32_sender", cannonical_sender.to_string())
         .add_message(message))
 }
 

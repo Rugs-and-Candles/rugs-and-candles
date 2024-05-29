@@ -130,8 +130,6 @@ fn perform_action(
         )
         .add_attribute("tile_id", user_tile.to_string())
         .add_submessages(msgs)
-        // TODO add IBC call to Controller to inform that the action is started or finished
-        // .add_message()
         .add_attribute("account_id", account_id.to_string()))
 }
 
@@ -180,7 +178,7 @@ fn create_lending_message(
 
     let money_market_name = "ghost".to_string();
     let money_market = adapter.ans_money_market(deps, money_market_name.clone());
-    // TODO: add the users funds to the money market deposit message
+
     let deposit_msg: CosmosMsg = money_market.query(MoneyMarketQueryMsg::GenerateMessages {
         message: MoneyMarketExecuteMsg::AnsAction {
             money_market: money_market_name,

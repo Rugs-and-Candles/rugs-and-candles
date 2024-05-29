@@ -18,11 +18,10 @@ pub fn module_ibc_handler(
     }
 
     let server_msg: BoardIbcMsg = from_json(&ibc_msg.msg)?;
-
     match server_msg {
         BoardIbcMsg::RegisterAction { user, tile_number } => {
             let tile_id: TileId = tile_number;
-            let user_addr = Addr::unchecked(user);
+            let user_addr = deps.api.addr_humanize(&user)?;
             return handle_register_action(deps, user_addr, tile_id);
         }
     }

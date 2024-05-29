@@ -1,6 +1,6 @@
 use abstract_adapter::{objects::AccountId, AdapterContract};
 use cosmwasm_schema::QueryResponses;
-use cosmwasm_std::{Addr, Coin};
+use cosmwasm_std::{Addr, CanonicalAddr, Coin};
 
 use crate::errors::BoardError;
 
@@ -88,7 +88,7 @@ pub struct OngoingActionResponse {}
 
 #[cosmwasm_schema::cw_serde]
 pub enum BoardIbcMsg {
-    RegisterAction { user: String, tile_number: u32 },
+    RegisterAction { user: CanonicalAddr, tile_number: u32 },
 }
 
 
