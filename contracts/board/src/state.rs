@@ -10,18 +10,6 @@ pub struct Config {
 
 pub type TileId = u32;
 
-#[cosmwasm_schema::cw_serde]
-pub struct RequiredAction {
-    required_funds: Vec<Coin>,
-    action_msgs: Vec<String>,
-}
-
-#[cosmwasm_schema::cw_serde]
-pub enum TileAction {
-    Rugg { n_tile: u8 },
-    Candle { n_tile: u8 },
-    Action { action: Option<RequiredAction> },
-}
 
 // default config
 pub const CONFIG: Item<Config> = Item::new("config");

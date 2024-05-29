@@ -1,12 +1,11 @@
 use crate::{
     contract::{AdapterResult, Controller},
     error::ControllerError,
-    msg::ControllerExecuteMsg,
     state::{PositionRange, BOARD_IDS, CONFIG, STATUS},
     CONTROLLER_NAMESPACE,
 };
 
-use common::module_ids::BOARD_ID;
+use common::{controller::ControllerExecuteMsg, module_ids::BOARD_ID};
 use abstract_adapter::{
     objects::{module::ModuleInfo, namespace::Namespace},
     sdk::{AccountVerification, IbcInterface, ModuleRegistryInterface},
@@ -76,7 +75,8 @@ fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> AdapterResult {
     let message = adapter.ibc_client(deps.as_ref()).module_ibc_action(
         board_id_ranges.0.to_string(), 
         ModuleInfo::from_id_latest(BOARD_ID)?,
-
+        &{},
+        None
     );
 
 

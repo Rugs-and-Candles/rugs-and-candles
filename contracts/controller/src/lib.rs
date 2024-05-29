@@ -7,7 +7,6 @@ pub mod state;
 
 pub use contract::interface::MyAdapterInterface;
 pub use error::ControllerError;
-pub use msg::{ControllerExecuteMsg, ControllerInstantiateMsg};
 
 /// The version of your Adapter
 pub const CONTROLLER_VERSION: &str = env!("CARGO_PKG_VERSION");

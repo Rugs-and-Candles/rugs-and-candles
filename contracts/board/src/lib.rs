@@ -8,6 +8,7 @@ pub mod state;
 pub use contract::interface::BoardInterface;
 pub use error::BoardError;
 pub use msg::{BoardExecuteMsg, BoardInstantiateMsg};
+pub use common::board::*;
 
 /// The version of your Adapter
 pub const BOARD_VERSION: &str = env!("CARGO_PKG_VERSION");

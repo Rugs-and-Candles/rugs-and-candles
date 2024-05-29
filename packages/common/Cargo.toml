@@ -20,3 +20,5 @@ cosmwasm-std = { version = "1.5.3" }
 cosmwasm-schema = { version = "1.5.3" }
 thiserror = "1.0"
 const_format = { workspace = true }
+abstract-adapter = {workspace = true}
+cw-orch.workspace = true
