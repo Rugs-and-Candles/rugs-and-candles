@@ -11,7 +11,6 @@ pub type Position = u32;
 
 /// Store the information of the contract configuration.
 pub const CONFIG: Item<Config> = Item::new("config");
-// TODO: whut?
 pub const STATUS: Map<&AccountId, String> = Map::new("status");
 
 /// Store the information of the owner of the contracts.

@@ -1,7 +1,6 @@
 /// This function convert a bech32 address into another bech32 address
 /// with the human readable part specified in the prefix.
 pub fn any_addr_to_prefix_addr(addr: String, prefix: &str) -> Result<String, bech32::Error> {
-    // TODO, test this snippet
     let (_hrp, data, _variant) = bech32::decode(&addr)?;
     let new_addr = bech32::encode(prefix, data, bech32::Variant::Bech32)?;
     Ok(new_addr)

@@ -102,8 +102,6 @@ fn perform_action(deps: DepsMut, info: MessageInfo, env: Env, adapter: BoardAdap
         .add_attribute("removed_user_from_tile", format!("{} form{}", info.sender.to_string(), user_tile.to_string()))
         .add_attribute("tile_id", user_tile.to_string())
         .add_submessages(msgs)
-        // TODO add IBC call to Controller to inform that the action is started or finished
-        // .add_message()
         .add_attribute("account_id", account_id.to_string()))
 }
 
@@ -136,10 +134,10 @@ fn create_lending_message(deps: Deps, env:Env, adapter: &BoardAdapter, user: &Ad
 
     let money_market_name = "ghost".to_string();
     let money_market = adapter.ans_money_market(deps, money_market_name.clone());
-    // TODO: add the users funds to the money market deposit message 
+
     let deposit_msg: CosmosMsg = money_market.query(MoneyMarketQueryMsg::GenerateMessages { 
         message: MoneyMarketExecuteMsg::AnsAction { money_market: money_market_name, action: MoneyMarketAnsAction::Deposit{
-            lending_asset:ans_asset
+            lending_asset: ans_asset
         } }, addr_as_sender: env.contract.address.to_string()})?;
 
     let sub_msg =  SubMsg::reply_on_success(deposit_msg, 0);
