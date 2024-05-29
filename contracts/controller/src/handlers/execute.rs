@@ -1,15 +1,12 @@
 use crate::{
-    contract::{AdapterResult, Controller},
-    error::ControllerError,
+    contract::{AdapterResult},
     state::{PositionRange, BOARD_IDS, CONFIG, STATUS},
     CONTROLLER_NAMESPACE,
 };
 
-use common::{controller::ControllerExecuteMsg, module_ids::BOARD_ID};
+use common::{controller::{Controller, ControllerExecuteMsg}, errors::ControllerError, module_ids::BOARD_ID};
 use abstract_adapter::{
-    objects::{module::ModuleInfo, namespace::Namespace},
-    sdk::{AccountVerification, IbcInterface, ModuleRegistryInterface},
-    traits::AbstractResponse,
+    objects::{module::ModuleInfo, namespace::Namespace}, sdk::{AccountVerification, IbcInterface, ModuleRegistryInterface}, std::ibc::CallbackInfo, traits::AbstractResponse
 };
 use cosmwasm_std::{ensure_eq, Addr, DepsMut, Env, MessageInfo, Order, StdError};
 
@@ -76,7 +73,7 @@ fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> AdapterResult {
         board_id_ranges.0.to_string(), 
         ModuleInfo::from_id_latest(BOARD_ID)?,
         &{},
-        None
+        Some(CallbackInfo {id: "".to_string(), msg: None})
     );
 
 

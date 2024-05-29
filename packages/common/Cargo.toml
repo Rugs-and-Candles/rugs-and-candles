@@ -22,3 +22,5 @@ thiserror = "1.0"
 const_format = { workspace = true }
 abstract-adapter = {workspace = true}
 cw-orch.workspace = true
+cw-asset = { workspace = true }
+cw-controllers = { workspace = true }

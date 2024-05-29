@@ -1,6 +1,17 @@
 
-use abstract_adapter::objects::AccountId;
+use abstract_adapter::{objects::AccountId, AdapterContract};
 use cosmwasm_schema::QueryResponses;
+
+use crate::errors::ControllerError;
+
+pub type Controller = AdapterContract<
+    ControllerError,
+    ControllerInstantiateMsg,
+    ControllerExecuteMsg,
+    ControllerQueryMsg,
+>;
+
+abstract_adapter::adapter_msg_types!(Controller, ControllerExecuteMsg, ControllerQueryMsg);
 
 /// Adapter instantiate message
 #[cosmwasm_schema::cw_serde]

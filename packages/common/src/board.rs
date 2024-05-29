@@ -1,13 +1,22 @@
 
-use abstract_adapter::objects::{chain_name::ChainName, AccountId};
+use abstract_adapter::{objects::{chain_name::ChainName, AccountId}, AdapterContract};
 use cosmwasm_schema::QueryResponses;
 use cosmwasm_std::Coin;
+
+use crate::errors::BoardError;
+
+/// The type of the adapter that is used to build your Adapter and access the Abstract SDK features.
+pub type BoardAdapter =
+    AdapterContract<BoardError, BoardInstantiateMsg, BoardExecuteMsg, BoardQueryMsg>;
+
+abstract_adapter::adapter_msg_types!(BoardAdapter, BoardExecuteMsg, BoardQueryMsg);
 
 #[cosmwasm_schema::cw_serde]
 pub struct RequiredAction {
     required_funds: Vec<Coin>,
     action_msgs: Vec<String>,
 }
+
 
 #[cosmwasm_schema::cw_serde]
 pub enum TileAction {

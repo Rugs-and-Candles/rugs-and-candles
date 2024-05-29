@@ -9,9 +9,7 @@ use crate::{
 use abstract_adapter::AdapterContract;
 use cosmwasm_std::Response;
 
-/// The type of the adapter that is used to build your Adapter and access the Abstract SDK features.
-pub type BoardAdapter =
-    AdapterContract<BoardError, BoardInstantiateMsg, BoardExecuteMsg, BoardQueryMsg>;
+
 /// The type of the result returned by your Adapter's entry points.
 pub type AdapterResult<T = Response> = Result<T, BoardError>;
 
