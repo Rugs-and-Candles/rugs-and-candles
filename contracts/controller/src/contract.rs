@@ -1,35 +1,35 @@
 use crate::{
-    error::MyAdapterError,
+    error::ControllerError,
     handlers,
-    msg::{MyAdapterExecuteMsg, MyAdapterInstantiateMsg, MyAdapterQueryMsg},
-    ADAPTER_VERSION, MY_ADAPTER_ID,
+    msg::{ControllerExecuteMsg, ControllerInstantiateMsg, ControllerQueryMsg},
+    CONTROLLER_ID, CONTROLLER_VERSION,
 };
 
 use abstract_adapter::AdapterContract;
 use cosmwasm_std::Response;
 
 /// The type of the adapter that is used to build your Adapter and access the Abstract SDK features.
-pub type MyAdapter = AdapterContract<
-    MyAdapterError,
-    MyAdapterInstantiateMsg,
-    MyAdapterExecuteMsg,
-    MyAdapterQueryMsg,
+pub type Controller = AdapterContract<
+    ControllerError,
+    ControllerInstantiateMsg,
+    ControllerExecuteMsg,
+    ControllerQueryMsg,
 >;
 /// The type of the result returned by your Adapter's entry points.
-pub type AdapterResult<T = Response> = Result<T, MyAdapterError>;
+pub type AdapterResult<T = Response> = Result<T, ControllerError>;
 
-const MY_ADAPTER: MyAdapter = MyAdapter::new(MY_ADAPTER_ID, ADAPTER_VERSION, None)
+const CONTROLLER: Controller = Controller::new(CONTROLLER_ID, CONTROLLER_VERSION, None)
     .with_instantiate(handlers::instantiate_handler)
     .with_execute(handlers::execute_handler)
     .with_query(handlers::query_handler);
 
 // Export handlers
 #[cfg(feature = "export")]
-abstract_adapter::export_endpoints!(MY_ADAPTER, MyAdapter);
+abstract_adapter::export_endpoints!(CONTROLLER, Controller);
 
 abstract_adapter::cw_orch_interface!(
-    MY_ADAPTER,
-    MyAdapter,
-    MyAdapterInstantiateMsg,
+    CONTROLLER,
+    Controller,
+    ControllerInstantiateMsg,
     MyAdapterInterface
 );

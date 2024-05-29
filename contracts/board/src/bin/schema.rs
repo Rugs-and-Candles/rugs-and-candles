@@ -1,5 +1,5 @@
+use controller::contract::Controller;
 use cosmwasm_schema::remove_schemas;
-use controller::contract::MyAdapter;
 use std::env::current_dir;
 use std::fs::create_dir_all;
 
@@ -10,5 +10,5 @@ fn main() {
     remove_schemas(&out_dir).unwrap();
 
     #[cfg(feature = "schema")]
-    MyAdapter::export_schema(&out_dir);
+    Controller::export_schema(&out_dir);
 }

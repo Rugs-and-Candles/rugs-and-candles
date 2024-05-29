@@ -1,6 +1,6 @@
 use crate::{
-    msg::{MyAdapterExecuteMsg, MyAdapterQueryMsg},
-    MY_ADAPTER_ID,
+    msg::{ControllerExecuteMsg, ControllerQueryMsg},
+    CONTROLLER_ID,
 };
 
 use abstract_adapter::sdk::{
@@ -19,7 +19,7 @@ pub trait MyAdapterApi: AccountIdentification + Dependencies + ModuleIdentificat
         MyAdapter {
             base: self,
             deps,
-            module_id: MY_ADAPTER_ID,
+            module_id: CONTROLLER_ID,
         }
     }
 }
@@ -45,7 +45,7 @@ impl<'a, T: MyAdapterApi> MyAdapter<'a, T> {
     }
 
     /// Executes a [MyAdapterExecuteMsg] in the adapter
-    fn request(&self, msg: MyAdapterExecuteMsg) -> AbstractSdkResult<CosmosMsg> {
+    fn request(&self, msg: ControllerExecuteMsg) -> AbstractSdkResult<CosmosMsg> {
         let adapters = self.base.adapters(self.deps);
 
         adapters.execute(self.module_id(), msg)
@@ -53,20 +53,23 @@ impl<'a, T: MyAdapterApi> MyAdapter<'a, T> {
 
     /// Route message
     pub fn update_config(&self) -> AbstractSdkResult<CosmosMsg> {
-        self.request(MyAdapterExecuteMsg::UpdateConfig {})
+        self.request(ControllerExecuteMsg::UpdateConfig {})
     }
 }
 
 /// Queries
 impl<'a, T: MyAdapterApi> MyAdapter<'a, T> {
     /// Query your adapter via message type
-    pub fn query<R: DeserializeOwned>(&self, query_msg: MyAdapterQueryMsg) -> AbstractSdkResult<R> {
+    pub fn query<R: DeserializeOwned>(
+        &self,
+        query_msg: ControllerQueryMsg,
+    ) -> AbstractSdkResult<R> {
         let adapters = self.base.adapters(self.deps);
         adapters.query(self.module_id(), query_msg)
     }
 
     /// Query config
     pub fn config(&self) -> AbstractSdkResult<Uint128> {
-        self.query(MyAdapterQueryMsg::Config {})
+        self.query(ControllerQueryMsg::Config {})
     }
 }
