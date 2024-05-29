@@ -7,8 +7,8 @@
 //! # Run
 //!
 //! `RUST_LOG=info cargo run --bin local_daemon --features="daemon-bin" --package my-adapter`
-use common::controller::{ControllerExecuteMsg, ControllerInstantiateMsg};
-use controller::{contract::interface::ControllerInterface, CONTROLLER_ID};
+use common::{controller::{ControllerExecuteMsg, ControllerInstantiateMsg}, module_ids::CONTROLLER_ID};
+use controller::contract::interface::ControllerInterface;
 
 use abstract_adapter::{objects::namespace::Namespace, std::adapter::AdapterRequestMsg};
 use abstract_client::{AbstractClient, Publisher};
