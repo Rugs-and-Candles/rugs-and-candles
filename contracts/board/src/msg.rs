@@ -1,7 +1,7 @@
 use crate::contract::BoardAdapter;
 use crate::state::TileAction;
 
-use abstract_adapter::objects::AccountId;
+use abstract_adapter::objects::{chain_name::ChainName, AccountId};
 use cosmwasm_schema::QueryResponses;
 
 // This is used for type safety and re-exporting the contract endpoint structs.
