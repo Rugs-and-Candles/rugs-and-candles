@@ -27,7 +27,6 @@ pub fn execute_handler(
     match msg {
         UpdateConfig {} => update_config(deps, info, adapter),
         SetStatus { status } => set_status(deps, adapter, status),
-        RegisterAction { user, tile_number } => register_action(deps, adapter, user, tile_number),
         PerformAction {} => perform_action(deps, info, adapter),
     }
 }
@@ -63,28 +62,6 @@ fn set_status(deps: DepsMut, adapter: BoardAdapter, status: String) -> BoardResu
         .add_attribute("account_id", account_id.to_string()))
 }
 
-/// Allows the controller to start an action for a user.
-fn register_action(
-    deps: DepsMut,
-    adapter: BoardAdapter,
-    user: String,
-    tile_number: u32,
-) -> BoardResult {
-    // TODO: only controller
-
-    adapter.modules(deps.as_ref()).module_address(IBC_CLIENT);
-
-    let user_addr = Addr::unchecked(user);
-    let tile_id: TileId = tile_number;
-    ONGOING_ACTIONS.save(deps.storage, &user_addr, &tile_id)?;
-
-    Ok(
-        adapter
-            .response("start_action")
-            .add_attribute("new_status", "started"), // TODO: add success IBC aknowledgement to inform controller
-    )
-}
-
 fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> BoardResult {
     let account_registry = adapter.account_registry(deps.as_ref())?;
 
@@ -93,10 +70,12 @@ fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> Bo
 
     let user_tile = ONGOING_ACTIONS.load(deps.storage, &info.sender)?;
     let user_action = TILES.load(deps.storage, user_tile)?;
+    // TODO: clear the user from the tiles
 
     Ok(adapter
         .response("finish_action")
         .add_attribute("new_status", "finished")
         // TODO add IBC call to Controller to inform that the action is started or finished
+        // .add_message()
         .add_attribute("account_id", account_id.to_string()))
 }

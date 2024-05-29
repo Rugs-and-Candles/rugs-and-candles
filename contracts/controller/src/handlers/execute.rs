@@ -63,14 +63,15 @@ fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> AdapterResult {
         .next().ok_or(StdError::generic_err("No board found"))??;
     let start_tile_id = position_range.start();
 
-    let target_chain_addr_prefix = "kuji"; // TODO: Ask Kayenski to remove this hardcoding and base it on the chain name
+    let target_chain_addr_prefix = "kuji"; // TODO: to a match statement that matches the chainName to the prefix
     let target_bech32_sender = any_addr_to_prefix_addr(sender.to_string(), &target_chain_addr_prefix).unwrap();
 
     let message = adapter.ibc_client(deps.as_ref()).module_ibc_action(
         chain_name.to_string(), 
         ModuleInfo::from_id_latest(BOARD_ID)?,
-        &common::board::BoardExecuteMsg::RegisterAction { user: target_bech32_sender.clone(), tile_number: 0 },
-        Some(CallbackInfo {id: CallbackIds::RegisterConfirm.into(), msg: None})
+        &common::board::BoardIbcMsg::RegisterAction { user: target_bech32_sender.clone(), tile_number: 0 },
+        None,
+        // Some(CallbackInfo {id: CallbackIds::RegisterConfirm.into(), msg: None})
     )?;
 
 

@@ -38,23 +38,23 @@ pub struct BoardInstantiateMsg {
     pub controller_address: String,
 }
 
-/// Adapter execute messages
-#[cosmwasm_schema::cw_serde]
-#[derive(cw_orch::ExecuteFns)]
-#[impl_into(ExecuteMsg)]
-pub enum BoardExecuteMsg {
-    /// Set status of your account
-    SetStatus {
-        status: String,
-    },
-    /// Admin method: Update the configuration of the adapter
-    UpdateConfig {},
-    RegisterAction {
-        user: String,
-        tile_number: u32,
-    },
-    PerformAction {},
-}
+    /// Adapter execute messages
+    #[cosmwasm_schema::cw_serde]
+    #[derive(cw_orch::ExecuteFns)]
+    #[impl_into(ExecuteMsg)]
+    pub enum BoardExecuteMsg {
+        /// Set status of your account
+        SetStatus {
+            status: String,
+        },
+        /// Admin method: Update the configuration of the adapter
+        UpdateConfig {},
+        // RegisterAction {
+        //     user: String,
+        //     tile_number: u32,
+        // },
+        PerformAction {},
+    }
 
 /// Adapter query messages
 #[cosmwasm_schema::cw_serde]
@@ -82,6 +82,5 @@ pub struct OngoingActionResponse {}
 
 #[cosmwasm_schema::cw_serde]
 pub enum BoardIbcMsg {
-    RegisterAction { user: Addr, tile_number: u32 },
+    RegisterAction { user: String, tile_number: u32 },
 }
-

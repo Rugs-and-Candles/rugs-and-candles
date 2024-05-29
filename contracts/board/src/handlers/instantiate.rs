@@ -27,7 +27,6 @@ pub fn instantiate_handler(
     let config: Config = Config { current_chain };
 
     CONFIG.save(deps.storage, &config)?;
-    // TODO: save the controller id. How?
 
     let tiles_map: HashMap<_, _> = msg
         .tiles_actions

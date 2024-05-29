@@ -29,11 +29,11 @@ pub fn module_ibc_handler(
 }
 
 fn handle_register_action(deps: DepsMut, user_addr: Addr, tile_id: TileId) -> BoardResult {
-    // TODO: Check if tile is rug or candle and in that case immediatey Proceed User
-    // switch
+    // switch 
+    //     case RUG:
+    //         new ibc rug message
 
 
     ONGOING_ACTIONS.save(deps.storage, &user_addr, &tile_id)?;
-    Ok(Response::new())
-    // TODO: Check if we dont need to add a ibc callback here
+    Ok(Response::new()) // GOOD
 }
