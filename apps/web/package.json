@@ -9,11 +9,16 @@
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
+    "@abstract-money/cli": "^0.4.1",
+    "@abstract-money/core": "^1.1.4",
+    "@abstract-money/provider-cosmoskit": "^3.0.6",
+    "@abstract-money/react": "^1.1.6",
     "@chakra-ui/react": "^2.8.2",
     "@cosmjs/cosmwasm-stargate": "^0.32.3",
     "@cosmjs/launchpad": "^0.27.1",
     "@cosmjs/proto-signing": "^0.32.3",
     "@cosmjs/stargate": "^0.32.3",
+    "@cosmwasm/ts-codegen": "^1.10.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@keplr-wallet/types": "^0.12.95",
