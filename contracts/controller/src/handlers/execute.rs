@@ -1,5 +1,5 @@
 use crate::{
-    contract::{AdapterResult},
+    contract::AdapterResult,
     state::{PositionRange, BOARD_IDS, CONFIG, STATUS},
 };
 

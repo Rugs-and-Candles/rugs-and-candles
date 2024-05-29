@@ -1,4 +1,4 @@
-use abstract_interchain_tests::setup::ibc_abstract_setup;
+use abstract_interchain_tests::setup::{ibc_abstract_setup, ibc_connect_abstract};
 use board::{BoardExecuteMsgFns, BoardInstantiateMsg, BoardInterface, RUGS_N_CANDLES_NAMESPACE};
 use common::{controller::{ConfigResponse, ControllerExecuteMsg, ControllerExecuteMsgFns, ControllerInstantiateMsg, ControllerQueryMsgFns, ExecuteMsg}, module_ids::CONTROLLER_ID};
 
@@ -45,7 +45,6 @@ impl TestEnv<MockBech32> {
             .install_adapter::<ControllerInterface<_>>(&[])?;
 
         let publisher = kujira_abs_client.publisher_builder(namespace).build()?;
-
         publisher.publish_adapter::<BoardInstantiateMsg, BoardInterface<_>>(
             BoardInstantiateMsg { chain: todo!(), tiles_actions: todo!(), tiles_number: todo!(), controller_address: todo!() },
         )?;
@@ -55,8 +54,8 @@ impl TestEnv<MockBech32> {
             .install_adapter::<BoardInterface<_>>(&[])?;
 
         
-        ibc_abstract_setup(&interchain, "neutron-1", "kujira-1")?;
-        ibc_abstract_setup(&interchain, "kujira-1", "neutron-1")?;
+        ibc_connect_abstract(&interchain, "neutron-1", "kujira-1")?;
+        ibc_connect_abstract(&interchain, "kujira-1", "neutron-1")?;
 
         let tx_result = neutron_controller.call_as(&neutron.addr_make("test1")).join()?;
         interchain.check_ibc("neutron-1", tx_result)?;
