@@ -2,6 +2,7 @@ use common::controller::ControllerExecuteMsg;
 use common::controller::ConfigResponse;
 use common::controller::ControllerInstantiateMsg;
 use common::controller::ControllerQueryMsgFns;
+use common::controller::ExecuteMsg;
 use controller::{
     contract::interface::MyAdapterInterface,
     CONTROLLER_ID, CONTROLLER_NAMESPACE,

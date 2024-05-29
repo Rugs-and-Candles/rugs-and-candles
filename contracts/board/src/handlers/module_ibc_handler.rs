@@ -1,10 +1,10 @@
 use abstract_adapter::{sdk::AbstractResponse, std::ibc::ModuleIbcMsg};
 use abstract_client::Namespace;
-use common::board::BoardAdapter;
-use cosmwasm_std::{DepsMut, Env, Response};
+use common::board::{BoardAdapter, BoardIbcMsg};
+use common::module_ids::CONTROLLER_ID;
+use cosmwasm_std::{from_json, Addr, DepsMut, Env, Response};
 
-use crate::contract::{BoardAdapter, BoardResult};
-use crate::msg::BoardIbcMsg;
+use crate::contract::BoardResult;
 use crate::state::{TileId, ONGOING_ACTIONS};
 use crate::BoardError;
 

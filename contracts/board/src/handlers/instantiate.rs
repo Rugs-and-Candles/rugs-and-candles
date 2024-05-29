@@ -1,12 +1,11 @@
 use std::collections::HashMap;
 
 use crate::{
-    contract::AdapterResult,
+    contract::BoardResult,
     state::{Config, CONFIG, TILES},
     BoardError,
 };
 
-use abstract_adapter::AdapterError;
 use common::{
     board::{BoardAdapter, BoardInstantiateMsg, TileAction},
     game::Chains,

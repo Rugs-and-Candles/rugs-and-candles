@@ -1,5 +1,5 @@
 use crate::{
-    contract::AdapterResult,
+    contract::BoardResult,
     state::{TileId, CONFIG, ONGOING_ACTIONS, STATUS, TILES},
     BoardError,
 };

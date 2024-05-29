@@ -1,6 +1,5 @@
 use crate::{
-    contract::AdapterResult,
-    state::{CONFIG, STATUS},
+    contract::BoardResult, state::{CONFIG, STATUS}
 };
 
 use abstract_adapter::objects::AccountId;

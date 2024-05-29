@@ -1,7 +1,7 @@
 
 use abstract_adapter::{objects::AccountId, AdapterContract};
 use cosmwasm_schema::QueryResponses;
-use cosmwasm_std::Coin;
+use cosmwasm_std::{Addr, Coin};
 
 use crate::errors::BoardError;
 
@@ -81,3 +81,9 @@ pub enum TileAction {
 
     #[cosmwasm_schema::cw_serde]
     pub struct OngoingActionResponse {}
+
+
+    #[cosmwasm_schema::cw_serde]
+pub enum BoardIbcMsg {
+    RegisterAction { user: Addr, tile_number: u32 },
+}
