@@ -8,7 +8,7 @@
 //! $ just publish uni-6 osmo-test-5
 //! ```
 use controller::{
-    contract::interface::MyAdapterInterface, CONTROLLER_ID,
+    contract::interface::ControllerInterface, CONTROLLER_ID,
 };
 
 use common::controller::ControllerInstantiateMsg;
@@ -43,7 +43,7 @@ fn publish(networks: Vec<ChainInfo>) -> anyhow::Result<()> {
         }
 
         // Publish the Adapter to the Abstract Platform
-        publisher.publish_adapter::<ControllerInstantiateMsg, MyAdapterInterface<Daemon>>(
+        publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<Daemon>>(
             ControllerInstantiateMsg {},
         )?;
     }

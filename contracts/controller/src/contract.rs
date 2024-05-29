@@ -27,5 +27,5 @@ abstract_adapter::cw_orch_interface!(
     CONTROLLER,
     Controller,
     common::controller::ControllerInstantiateMsg,
-    MyAdapterInterface
+    ControllerInterface
 );

@@ -9,7 +9,7 @@
 //! ```
 use common::controller::ControllerInstantiateMsg;
 use controller::{
-    contract::interface::MyAdapterInterface, CONTROLLER_ID,
+    contract::interface::ControllerInterface, CONTROLLER_ID,
 };
 
 use abstract_adapter::objects::namespace::Namespace;
@@ -42,7 +42,7 @@ fn publish(networks: Vec<ChainInfo>) -> anyhow::Result<()> {
         }
 
         // Publish the Adapter to the Abstract Platform
-        publisher.publish_adapter::<ControllerInstantiateMsg, MyAdapterInterface<Daemon>>(
+        publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<Daemon>>(
             ControllerInstantiateMsg {},
         )?;
     }

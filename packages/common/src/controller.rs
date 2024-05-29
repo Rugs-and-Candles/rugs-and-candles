@@ -19,6 +19,8 @@ pub struct ControllerInstantiateMsg {}
 
 /// Adapter execute messages
 #[cosmwasm_schema::cw_serde]
+#[derive(cw_orch::ExecuteFns)]
+#[impl_into(ExecuteMsg)]
 pub enum ControllerExecuteMsg {
     /// Set status of your account
     SetStatus {

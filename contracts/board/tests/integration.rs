@@ -1,19 +1,19 @@
-use controller::{
-    contract::interface::MyAdapterInterface,
-    msg::{ConfigResponse, ControllerInstantiateMsg, ExecuteMsg, MyAdapterQueryMsgFns},
-    ControllerExecuteMsg, CONTROLLER_ID, CONTROLLER_NAMESPACE,
-};
+use abstract_interchain_tests::setup::ibc_abstract_setup;
+use board::{BoardInstantiateMsg, BoardInterface, RUGS_N_CANDLES_NAMESPACE};
+use common::{controller::{ConfigResponse, ControllerExecuteMsg, ControllerExecuteMsgFns, ControllerInstantiateMsg, ControllerQueryMsgFns, ExecuteMsg}, module_ids::CONTROLLER_ID};
+
 
 use abstract_adapter::std::{adapter::AdapterRequestMsg, objects::namespace::Namespace};
 use abstract_client::{AbstractClient, Application, Publisher};
-use cosmwasm_std::coins;
+use controller::ControllerInterface;
 // Use prelude to get all the necessary imports
 use cw_orch::{anyhow, prelude::*};
+use cw_orch_interchain::prelude::*;
 
 struct TestEnv<Env: CwEnv> {
-    publisher: Publisher<Env>,
-    abs: AbstractClient<Env>,
-    adapter: Application<Env, MyAdapterInterface<Env>>,
+    controller: Application<Env, ControllerInterface<Env>>,
+    board: Application<Env, BoardInterface<Env>>,
+    interchain: MockBech32InterchainEnv,
 }
 
 impl TestEnv<MockBech32> {
@@ -21,29 +21,49 @@ impl TestEnv<MockBech32> {
     #[allow(clippy::type_complexity)]
     fn setup() -> anyhow::Result<TestEnv<MockBech32>> {
         // Create a sender and mock env
-        let mock = MockBech32::new("mock");
-        let sender = mock.sender();
-        let namespace = Namespace::new(CONTROLLER_NAMESPACE)?;
+        let interchain = MockBech32InterchainEnv::new(vec![("neutron-1", "ntrn"), ("kujira-1", "kuji")]);
+        let neutron = interchain.chain("neutron-1")?;
+        let kujira_chain = interchain.chain("kujira-1")?;
+
+
+
+        let namespace = Namespace::new(RUGS_N_CANDLES_NAMESPACE)?;
 
         // You can set up Abstract with a builder.
-        let abs_client = AbstractClient::builder(mock).build()?;
+        let neturn_abs_client = AbstractClient::builder(neutron).build()?;
+        let kujira_abs_client = AbstractClient::builder(kujira_chain).build()?;
         // The adapter supports setting balances for addresses and configuring ANS.
-        abs_client.set_balance(sender, &coins(123, "ucosm"))?;
 
         // Publish the adapter
-        let publisher = abs_client.publisher_builder(namespace).build()?;
-        publisher.publish_adapter::<ControllerInstantiateMsg, MyAdapterInterface<_>>(
+        let publisher = neturn_abs_client.publisher_builder(namespace).build()?;
+        publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<_>>(
             ControllerInstantiateMsg {},
         )?;
 
-        let adapter = publisher
+        let neutron_controller = publisher
             .account()
-            .install_adapter::<MyAdapterInterface<_>>(&[])?;
+            .install_adapter::<ControllerInterface<_>>(&[])?;
 
+        let publisher = kujira_abs_client.publisher_builder(namespace).build()?;
+        publisher.publish_adapter::<BoardInstantiateMsg, BoardInterface<_>>(
+            BoardInstantiateMsg { chain: todo!(), tiles_actions: todo!(), tiles_number: todo!(), controller_address: todo!() },
+        )?;
+
+        let kuji_board = publisher
+            .account()
+            .install_adapter::<BoardInterface<_>>(&[])?;
+
+        
+        ibc_abstract_setup(&interchain, "neutron-1", "kujira-1")?;
+        ibc_abstract_setup(&interchain, "kujira-1", "neutron-1")?;
+
+        let tx_result = neutron_controller.call_as(&neutron.addr_make("test1")).join()?;
+        interchain.check_ibc("neutron-1", tx_result)?;
+        
         Ok(TestEnv {
-            abs: abs_client,
-            publisher,
-            adapter,
+            controller: neutron_controller,
+            board: kuji_board,
+            interchain,
         })
     }
 }
@@ -51,58 +71,70 @@ impl TestEnv<MockBech32> {
 #[test]
 fn successful_install() -> anyhow::Result<()> {
     let env = TestEnv::setup()?;
-    let adapter = env.adapter;
+    let controller = env.controller;
+    let config = controller.config()?;
 
-    let config = adapter.config()?;
     assert_eq!(config, ConfigResponse {});
     Ok(())
 }
 
 #[test]
-fn update_config() -> anyhow::Result<()> {
+fn basic_execute() -> anyhow::Result<()> {
     let env = TestEnv::setup()?;
-    let adapter = env.adapter;
+    let controller = env.controller;
 
-    // Executing it on publisher account
-    // Note that it's not a requirement to have it installed in this case
-    let publisher_account = env
-        .abs
-        .publisher_builder(Namespace::new(CONTROLLER_NAMESPACE).unwrap())
-        .build()?;
-
-    adapter.execute(
-        &AdapterRequestMsg {
-            proxy_address: Some(publisher_account.account().proxy()?.to_string()),
-            request: ControllerExecuteMsg::UpdateConfig {},
-        }
-        .into(),
-        None,
-    )?;
-
-    let config = adapter.config()?;
-    let expected_response = controller::msg::ConfigResponse {};
-    assert_eq!(config, expected_response);
-
-    // Adapter installed on sub-account of the publisher so this should error
-    let err = adapter
-        .execute(
-            &AdapterRequestMsg {
-                proxy_address: Some(adapter.account().proxy()?.to_string()),
-                request: ControllerExecuteMsg::UpdateConfig {},
-            }
-            .into(),
-            None,
-        )
-        .unwrap_err();
-    assert_eq!(err.root().to_string(), "Unauthorized");
+    let response = controller.join()?;
+    env.interchain.check_ibc("neutron-1", response)?;
 
     Ok(())
 }
 
+// #[test]
+// fn update_config() -> anyhow::Result<()> {
+//     let env = TestEnv::setup()?;
+
+//     // Executing it on publisher account
+//     // Note that it's not a requirement to have it installed in this case
+//     let publisher_account = env
+//         .abs
+//         .publisher_builder(Namespace::new(RUGS_N_CANDLES_NAMESPACE).unwrap())
+//         .build()?;
+
+//     adapter.execute(
+//         &AdapterRequestMsg {
+//             proxy_address: Some(publisher_account.account().proxy()?.to_string()),
+//             request: ControllerExecuteMsg::UpdateConfig {},
+//         }
+//         .into(),
+//         None,
+//     )?;
+
+//     let config = adapter.config()?;
+//     let expected_response = common::controller::ConfigResponse {};
+//     assert_eq!(config, expected_response);
+
+//     // Adapter installed on sub-account of the publisher so this should error
+//     let err = adapter
+//         .execute(
+//             &AdapterRequestMsg {
+//                 proxy_address: Some(adapter.account().proxy()?.to_string()),
+//                 request: ControllerExecuteMsg::UpdateConfig {},
+//             }
+//             .into(),
+//             None,
+//         )
+//         .unwrap_err();
+//     assert_eq!(err.root().to_string(), "Unauthorized");
+
+//     Ok(())
+// }
+
 #[test]
 fn set_status() -> anyhow::Result<()> {
     let env = TestEnv::setup()?;
-    let adapter = env.adapter;
+    let adapter = env.controller.set_status(
+        "my_status".to_owned(),
+    )?;
 
     let first_status = "my_status".to_owned();
     let second_status = "my_status".to_owned();
@@ -122,7 +154,7 @@ fn set_status() -> anyhow::Result<()> {
     let new_account = env
         .abs
         .account_builder()
-        .install_adapter::<MyAdapterInterface<MockBech32>>()?
+        .install_adapter::<ControllerInterface<MockBech32>>()?
         .build()?;
 
     new_account.as_ref().manager.execute_on_module(
@@ -143,3 +175,5 @@ fn set_status() -> anyhow::Result<()> {
 
     Ok(())
 }
+
+

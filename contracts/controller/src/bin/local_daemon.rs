@@ -8,7 +8,7 @@
 //!
 //! `RUST_LOG=info cargo run --bin local_daemon --features="daemon-bin" --package my-adapter`
 use common::controller::{ControllerExecuteMsg, ControllerInstantiateMsg};
-use controller::{contract::interface::MyAdapterInterface, CONTROLLER_ID};
+use controller::{contract::interface::ControllerInterface, CONTROLLER_ID};
 
 use abstract_adapter::{objects::namespace::Namespace, std::adapter::AdapterRequestMsg};
 use abstract_client::{AbstractClient, Publisher};
@@ -50,7 +50,7 @@ fn main() -> anyhow::Result<()> {
     );
 
     // Publish the Adapter to the Abstract Platform
-    publisher.publish_adapter::<ControllerInstantiateMsg, MyAdapterInterface<Daemon>>(
+    publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<Daemon>>(
         ControllerInstantiateMsg {},
     )?;
 
@@ -58,7 +58,7 @@ fn main() -> anyhow::Result<()> {
 
     let account = abstract_client.account_builder().build()?;
     // Installs the adapter on the Account
-    let adapter = account.install_adapter::<MyAdapterInterface<_>>(&[])?;
+    let adapter = account.install_adapter::<ControllerInterface<_>>(&[])?;
 
     // // Import adapter's endpoint function traits for easy interactions.
     use common::controller::ControllerQueryMsgFns;

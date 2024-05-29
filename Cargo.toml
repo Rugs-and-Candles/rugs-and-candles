@@ -34,6 +34,7 @@ lazy_static = "1.4.0"
 
 
 cw-orch = { version = "0.22.2" }
+cw-orch-interchain = { version = "0.1.0" }
 const_format = "0.2.32"
 
 controller = { path = "contracts/controller" }

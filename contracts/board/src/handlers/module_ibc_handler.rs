@@ -23,7 +23,8 @@ pub fn module_ibc_handler(
     match server_msg {
         BoardIbcMsg::RegisterAction { user, tile_number } => {
             let tile_id: TileId = tile_number;
-            return handle_register_action(deps, user, tile_id);
+            let user_addr = Addr::unchecked(user);
+            return handle_register_action(deps, user_addr, tile_id);
         }
     }
 }

@@ -4,7 +4,7 @@ use common::controller::ControllerInstantiateMsg;
 use common::controller::ControllerQueryMsgFns;
 use common::controller::ExecuteMsg;
 use controller::{
-    contract::interface::MyAdapterInterface,
+    contract::interface::ControllerInterface,
     CONTROLLER_ID, CONTROLLER_NAMESPACE,
 };
 
@@ -17,7 +17,7 @@ use cw_orch::{anyhow, prelude::*};
 struct TestEnv<Env: CwEnv> {
     publisher: Publisher<Env>,
     abs: AbstractClient<Env>,
-    adapter: Application<Env, MyAdapterInterface<Env>>,
+    adapter: Application<Env, ControllerInterface<Env>>,
 }
 
 impl TestEnv<MockBech32> {
@@ -36,13 +36,13 @@ impl TestEnv<MockBech32> {
 
         // Publish the adapter
         let publisher = abs_client.publisher_builder(namespace).build()?;
-        publisher.publish_adapter::<ControllerInstantiateMsg, MyAdapterInterface<_>>(
+        publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<_>>(
             ControllerInstantiateMsg {},
         )?;
 
         let adapter = publisher
             .account()
-            .install_adapter::<MyAdapterInterface<_>>(&[])?;
+            .install_adapter::<ControllerInterface<_>>(&[])?;
 
         Ok(TestEnv {
             abs: abs_client,
@@ -126,7 +126,7 @@ fn set_status() -> anyhow::Result<()> {
     let new_account = env
         .abs
         .account_builder()
-        .install_adapter::<MyAdapterInterface<MockBech32>>()?
+        .install_adapter::<ControllerInterface<MockBech32>>()?
         .build()?;
 
     new_account.as_ref().manager.execute_on_module(
