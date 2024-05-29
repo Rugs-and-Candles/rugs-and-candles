@@ -1,30 +1,35 @@
 use abstract_adapter::std::ibc::ModuleIbcMsg;
 use abstract_client::Namespace;
-use cosmwasm_std::{DepsMut, Env, Response};
+use controller::CONTROLLER_ID;
+use cosmwasm_std::{from_json, Addr, DepsMut, Env, Response};
 use cw_orch::mock::cw_multi_test::error::Error;
 
+use crate::contract::{BoardAdapter, BoardResult};
+use crate::msg::BoardIbcMsg;
+use crate::state::{TileId, ONGOING_ACTIONS};
 use crate::BoardError;
 
-pub fn module_ibc_handler<Module, Error>(
-    _deps: DepsMut,
+pub fn module_ibc_handler(
+    deps: DepsMut,
     _env: Env,
-    _module: Module,
-    msg: ModuleIbcMsg,
-) -> Result<Response, BoardError> {
-
-    if msg.source_module.name != "" || msg.source_module.namespace != Namespace::new("").unwrap() {
-        return Err(BoardError::Unauthorized {  })
+    _module: BoardAdapter,
+    ibc_msg: ModuleIbcMsg,
+) -> BoardResult<Response> {
+    if ibc_msg.source_module.id().ne(CONTROLLER_ID) {
+        return Err(BoardError::Unauthorized {});
     }
 
-    // let server_msg: ServerIbcMessage = from_json(&ibc_msg.msg)?;
-    // let user_addr = Addr::unchecked(user);
-    // let tile_id: TileId = tile_number;
-    // ONGOING_ACTIONS.save(deps.storage, &user_addr, &tile_id)?;
+    let server_msg: BoardIbcMsg = from_json(&ibc_msg.msg)?;
 
-    Ok(
-        adapter
-            .response("start_action")
-            .add_attribute("new_status", "started"), // TODO: add success IBC aknowledgement to inform controller
-    )
-    unimplemented!()
+    match server_msg {
+        BoardIbcMsg::RegisterAction { user, tile_number } => {
+            let tile_id: TileId = tile_number;
+            return handle_register_action(deps, user, tile_id);
+        }
+    }
+}
+
+fn handle_register_action(deps: DepsMut, user_addr: Addr, tile_id: TileId) -> BoardResult {
+    ONGOING_ACTIONS.save(deps.storage, &user_addr, &tile_id)?;
+    Ok(Response::new())
 }

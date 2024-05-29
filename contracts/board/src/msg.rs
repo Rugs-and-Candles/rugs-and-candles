@@ -3,6 +3,7 @@ use crate::state::TileAction;
 
 use abstract_adapter::objects::{chain_name::ChainName, AccountId};
 use cosmwasm_schema::QueryResponses;
+use cosmwasm_std::Addr;
 
 // This is used for type safety and re-exporting the contract endpoint structs.
 abstract_adapter::adapter_msg_types!(BoardAdapter, BoardExecuteMsg, BoardQueryMsg);
@@ -31,10 +32,6 @@ pub enum BoardExecuteMsg {
     },
     /// Admin method: Update the configuration of the adapter
     UpdateConfig {},
-    RegisterAction {
-        user: String,
-        tile_number: u32,
-    },
     PerformAction {},
 }
 
@@ -61,3 +58,8 @@ pub struct StatusResponse {
 
 #[cosmwasm_schema::cw_serde]
 pub struct OngoingActionResponse {}
+
+#[cosmwasm_schema::cw_serde]
+pub enum BoardIbcMsg {
+    RegisterAction { user: Addr, tile_number: u32 },
+}

@@ -12,7 +12,7 @@ use cosmwasm_std::Response;
 pub type BoardAdapter =
     AdapterContract<BoardError, BoardInstantiateMsg, BoardExecuteMsg, BoardQueryMsg>;
 /// The type of the result returned by your Adapter's entry points.
-pub type AdapterResult<T = Response> = Result<T, BoardError>;
+pub type BoardResult<T = Response> = Result<T, BoardError>;
 
 const BOARD: BoardAdapter = BoardAdapter::new(BOARD_ID, BOARD_VERSION, None)
     .with_instantiate(handlers::instantiate_handler)
