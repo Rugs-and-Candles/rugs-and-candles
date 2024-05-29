@@ -31,11 +31,11 @@ pub enum BoardExecuteMsg {
     },
     /// Admin method: Update the configuration of the adapter
     UpdateConfig {},
-    StartAction {
+    RegisterAction {
         user: String,
         tile_number: u32,
     },
-    FinishAction {},
+    PerformAction {},
 }
 
 /// Adapter query messages

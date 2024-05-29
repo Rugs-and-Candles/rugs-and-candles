@@ -24,8 +24,8 @@ pub fn execute_handler(
     match msg {
         UpdateConfig {} => update_config(deps, info, adapter),
         SetStatus { status } => set_status(deps, adapter, status),
-        StartAction { user, tile_number } => start_action(deps, adapter, user, tile_number),
-        FinishAction {} => finish_action(deps, info, adapter),
+        RegisterAction { user, tile_number } => register_action(deps, adapter, user, tile_number),
+        PerformAction {} => perform_action(deps, info, adapter),
     }
 }
 
@@ -61,7 +61,7 @@ fn set_status(deps: DepsMut, adapter: BoardAdapter, status: String) -> AdapterRe
 }
 
 /// Allows the controller to start an action for a user.
-fn start_action(
+fn register_action(
     deps: DepsMut,
     adapter: BoardAdapter,
     user: String,
@@ -69,20 +69,20 @@ fn start_action(
 ) -> AdapterResult {
     // TODO: only controller
 
-    // adapter.modules(deps.as_ref()).module_address(IBC_CLIENT);
+    adapter.modules(deps.as_ref()).module_address(IBC_CLIENT);
 
     let user_addr = Addr::unchecked(user);
     let tile_id: TileId = tile_number;
     ONGOING_ACTIONS.save(deps.storage, &user_addr, &tile_id)?;
 
-    Ok(adapter
-        .response("start_action")
-        .add_attribute("new_status", "started")
-        // TODO: add success IBC aknowledgement to inform controller
-        .add_attribute("account_id", account_id.to_string()))
+    Ok(
+        adapter
+            .response("start_action")
+            .add_attribute("new_status", "started"), // TODO: add success IBC aknowledgement to inform controller
+    )
 }
 
-fn finish_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> AdapterResult {
+fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> AdapterResult {
     let account_registry = adapter.account_registry(deps.as_ref())?;
 
     let account_id = account_registry.account_id(adapter.target()?)?;
