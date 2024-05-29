@@ -18,12 +18,9 @@
     "@cosmjs/launchpad": "^0.27.1",
     "@cosmjs/proto-signing": "^0.32.3",
     "@cosmjs/stargate": "^0.32.3",
-<<<<<<< HEAD
     "@cosmos-kit/core": "^2.12.0",
     "@cosmos-kit/react": "^2.14.1",
-=======
     "@cosmwasm/ts-codegen": "^1.10.0",
->>>>>>> f41f7fec1cb27d90af44ec469de6acdc41a642b7
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@interchain-ui/react": "^1.23.13",
