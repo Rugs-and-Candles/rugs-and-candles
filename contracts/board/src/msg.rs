@@ -1,5 +1,6 @@
+use common::board::{BoardExecuteMsg, BoardQueryMsg};
+
 use crate::contract::BoardAdapter;
-use crate::state::TileAction;
 
 use abstract_adapter::objects::{chain_name::ChainName, AccountId};
 use cosmwasm_schema::QueryResponses;
@@ -63,3 +64,4 @@ pub struct OngoingActionResponse {}
 pub enum BoardIbcMsg {
     RegisterAction { user: Addr, tile_number: u32 },
 }
+abstract_adapter::adapter_msg_types!(BoardAdapter, BoardExecuteMsg, BoardQueryMsg);

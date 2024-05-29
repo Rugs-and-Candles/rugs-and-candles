@@ -8,10 +8,11 @@ pub mod state;
 pub use contract::interface::BoardInterface;
 pub use error::BoardError;
 pub use msg::{BoardExecuteMsg, BoardInstantiateMsg};
+pub use common::board::*;
 
 /// The version of your Adapter
 pub const BOARD_VERSION: &str = env!("CARGO_PKG_VERSION");
 
-pub const BOARD_NAMESPACE: &str = "rugsandcandles";
-pub const BOARD_NAME: &str = "board";
-pub const BOARD_ID: &str = const_format::formatcp!("{BOARD_NAMESPACE}:{BOARD_NAME}");
+pub use common::module_ids::BOARD_NAME;
+pub use common::module_ids::BOARD_ID;
+pub use common::module_ids::RUGS_N_CANDLES_NAMESPACE;

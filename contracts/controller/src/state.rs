@@ -1,6 +1,6 @@
-use abstract_adapter::objects::AccountId;
+use abstract_adapter::objects::{chain_name::ChainName, AccountId};
 use cosmwasm_std::Addr;
-use cw_storage_plus::{ Item, Map};
+use cw_storage_plus::{ Item, Map, IndexedMap,};
 
 #[cosmwasm_schema::cw_serde]
 pub struct Config {}
@@ -15,12 +15,14 @@ pub const OWNER: Item<&Addr> = Item::new("owner");
 
 pub const PARTICIPANTS: Map<&Addr, Position> = Map::new("participants");
 
-type BoardId = AccountId;
-
 /// A inclusive range of positions on the board
+#[cosmwasm_schema::cw_serde]
 pub struct PositionRange (Position, Position);
 
+pub type BoardId = ChainName;
+
 pub const BOARD_IDS: Map<&BoardId, PositionRange> = Map::new("board_ids");
+
 
 impl PositionRange {
     pub fn new(start: Position, end: Position) -> Self {
@@ -41,10 +43,9 @@ impl PositionRange {
 }
 
 pub fn board_for_position(position: Position) -> Option<BoardId> {
-    todo!()
-    // BOARD_IDS
-    //     .iter()
-    //     .find(|(_, range)| range.positions().contains(&position))
-    //     .map(|(board_id, _)| board_id)
+    BOARD_IDS
+        .iter()
+        .find(|(_, range)| range.positions().contains(&position))
+        .map(|(board_id, _)| board_id)
 }
 

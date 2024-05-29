@@ -1,5 +1,5 @@
 use crate::{
-    contract::{AdapterResult, BoardAdapter},
+    contract::{BoardAdapter, BoardResult},
     msg::{BoardQueryMsg, ConfigResponse, StatusResponse},
     state::{CONFIG, STATUS},
 };
@@ -12,7 +12,7 @@ pub fn query_handler(
     _env: Env,
     _adapter: &BoardAdapter,
     msg: BoardQueryMsg,
-) -> AdapterResult<Binary> {
+) -> BoardResult<Binary> {
     use BoardQueryMsg::*;
     match msg {
         Config {} => to_json_binary(&query_config(deps)?),

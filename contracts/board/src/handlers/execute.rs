@@ -1,5 +1,5 @@
 use crate::{
-    contract::{AdapterResult, BoardAdapter},
+    contract::{BoardAdapter, BoardResult},
     msg::BoardExecuteMsg,
     state::{TileId, CONFIG, ONGOING_ACTIONS, STATUS, TILES},
     BoardError, BOARD_NAMESPACE,
@@ -19,7 +19,7 @@ pub fn execute_handler(
     info: MessageInfo,
     adapter: BoardAdapter,
     msg: BoardExecuteMsg,
-) -> AdapterResult {
+) -> BoardResult {
     use BoardExecuteMsg::*;
     match msg {
         UpdateConfig {} => update_config(deps, info, adapter),
@@ -30,7 +30,7 @@ pub fn execute_handler(
 }
 
 /// Update the configuration of the adapter
-fn update_config(deps: DepsMut, _msg_info: MessageInfo, adapter: BoardAdapter) -> AdapterResult {
+fn update_config(deps: DepsMut, _msg_info: MessageInfo, adapter: BoardAdapter) -> BoardResult {
     // Only admin(namespace owner) can change recipient address
     let namespace = adapter
         .module_registry(deps.as_ref())?
@@ -48,7 +48,7 @@ fn update_config(deps: DepsMut, _msg_info: MessageInfo, adapter: BoardAdapter) -
     Ok(adapter.response("update_config"))
 }
 
-fn set_status(deps: DepsMut, adapter: BoardAdapter, status: String) -> AdapterResult {
+fn set_status(deps: DepsMut, adapter: BoardAdapter, status: String) -> BoardResult {
     let account_registry = adapter.account_registry(deps.as_ref())?;
 
     let account_id = account_registry.account_id(adapter.target()?)?;
@@ -66,7 +66,7 @@ fn register_action(
     adapter: BoardAdapter,
     user: String,
     tile_number: u32,
-) -> AdapterResult {
+) -> BoardResult {
     // TODO: only controller
 
     adapter.modules(deps.as_ref()).module_address(IBC_CLIENT);
@@ -82,7 +82,7 @@ fn register_action(
     )
 }
 
-fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> AdapterResult {
+fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> BoardResult {
     let account_registry = adapter.account_registry(deps.as_ref())?;
 
     let account_id = account_registry.account_id(adapter.target()?)?;
@@ -97,4 +97,3 @@ fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> Ad
         // TODO add IBC call to Controller to inform that the action is started or finished
         .add_attribute("account_id", account_id.to_string()))
 }
-

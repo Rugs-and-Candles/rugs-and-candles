@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
-    contract::{AdapterResult, BoardAdapter},
+    contract::{BoardAdapter, BoardResult},
     msg::BoardInstantiateMsg,
     state::{Config, TileAction, CONFIG, TILES},
     BoardError,
@@ -17,7 +17,7 @@ pub fn instantiate_handler(
     _info: MessageInfo,
     _adapter: BoardAdapter,
     msg: BoardInstantiateMsg,
-) -> AdapterResult {
+) -> BoardResult {
     let current_chain = Chains::from(&msg.chain);
     if current_chain == Chains::NonSupported {
         return Err(BoardError::InvalidChain(msg.chain));
