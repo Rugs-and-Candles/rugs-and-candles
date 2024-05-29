@@ -1,5 +1,5 @@
 use abstract_adapter::objects::AccountId;
-use common::game::Chains;
+use common::{board::TileAction, game::Chains};
 use cosmwasm_std::{Addr, Coin};
 use cw_storage_plus::{Item, Map};
 

@@ -1,13 +1,10 @@
 pub mod api;
 pub mod contract;
-pub mod error;
 mod handlers;
-pub mod msg;
 pub mod state;
 
 pub use contract::interface::BoardInterface;
-pub use error::BoardError;
-pub use msg::{BoardExecuteMsg, BoardInstantiateMsg};
+pub use common::errors::BoardError;
 pub use common::board::*;
 
 /// The version of your Adapter

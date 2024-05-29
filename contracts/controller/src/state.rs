@@ -42,10 +42,3 @@ impl PositionRange {
     }
 }
 
-pub fn board_for_position(position: Position) -> Option<BoardId> {
-    BOARD_IDS
-        .iter()
-        .find(|(_, range)| range.positions().contains(&position))
-        .map(|(board_id, _)| board_id)
-}
-

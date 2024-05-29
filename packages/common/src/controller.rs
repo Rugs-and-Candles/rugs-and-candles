@@ -33,6 +33,7 @@ pub enum ControllerExecuteMsg {
 /// Adapter query messages
 #[cosmwasm_schema::cw_serde]
 #[derive(QueryResponses, cw_orch::QueryFns)]
+#[impl_into(QueryMsg)]
 pub enum ControllerQueryMsg {
     #[returns(StatusResponse)]
     Status { account_id: AccountId },
