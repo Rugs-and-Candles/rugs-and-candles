@@ -17,7 +17,7 @@ pub struct BoardInstantiateMsg {
     /// the action to perform.
     pub tiles_actions: Vec<(u32, TileAction)>,
     /// Number of tiles associated with this chain.
-    pub tiles_number: u64,
+    pub tiles_number: u32,
     /// Controller addres
     pub controller_address: String,
 }

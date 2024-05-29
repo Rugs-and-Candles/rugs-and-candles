@@ -1,7 +1,9 @@
+use std::collections::HashMap;
+
 use crate::{
     contract::{AdapterResult, BoardAdapter},
     msg::BoardInstantiateMsg,
-    state::{Config, CONFIG, TILES},
+    state::{Config, TileAction, CONFIG, TILES},
     BoardError,
 };
 
@@ -26,11 +28,18 @@ pub fn instantiate_handler(
     CONFIG.save(deps.storage, &config)?;
     // TODO: save the controller id. How?
 
-    let tiles_map: HashMap<_, _> = vec.into_iter().map(|(key, value)| (key, value)).collect();
+    let tiles_map: HashMap<_, _> = msg
+        .tiles_actions
+        .into_iter()
+        .map(|(key, value)| (key, value))
+        .collect();
 
-    // for i in 0..msg.tiles_number {
-    //     if tiles_map.contains
-    //     TILES.save(deps.storage,i, )
-    // }
+    for i in 0..msg.tiles_number {
+        match tiles_map.get(&i) {
+            Some(action) => TILES.save(deps.storage, i, &action)?,
+            None => TILES.save(deps.storage, i, &TileAction::Action { action: None })?,
+        }
+    }
+
     Ok(Response::new())
 }
