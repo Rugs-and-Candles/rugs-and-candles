@@ -1,0 +1,20 @@
+[package]
+name = "common"
+description = "Collection of types shared in the workspace."
+version = "0.0.1"
+authors = [
+  "0xstepit",
+  "MbBrainz",
+  "clydedevv"
+]
+edition = "2021"
+homepage = ""
+documentation = ""
+repository = ""
+license = "GPL-3.0-or-later"
+keywords = ["cosmos", "cosmwasm", "abstractsdk"]
+resolver = "2"
+
+[dependencies]
+cosmwasm-std = { version = "1.5.3" }
+cosmwasm-schema = { version = "1.5.3" }

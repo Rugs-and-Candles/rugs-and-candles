@@ -1,5 +1,10 @@
 [workspace]
-members = ["contracts/*"]
+members = ["contracts/*", "packages/*"]
+exclude = [
+    "packages/eslint-config", # Exclude this specific crate
+  "packages/typescript-config",
+  "packages/ui",
+]
 resolver = "2"
 
 [profile.release]

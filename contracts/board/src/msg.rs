@@ -1,4 +1,5 @@
 use crate::contract::BoardAdapter;
+use crate::state::TileAction;
 
 use abstract_adapter::objects::AccountId;
 use cosmwasm_schema::QueryResponses;
@@ -8,7 +9,18 @@ abstract_adapter::adapter_msg_types!(BoardAdapter, BoardExecuteMsg, BoardQueryMs
 
 /// Adapter instantiate message
 #[cosmwasm_schema::cw_serde]
-pub struct BoardInstantiateMsg {}
+pub struct BoardInstantiateMsg {
+    /// The name of the chain in which this contract
+    /// is instantiated.
+    chain: String,
+    /// A vector containing the index of the tile and
+    /// the action to perform.
+    tiles_actions: Vec<(u64, String)>,
+    /// Number of tiles associated with this chain.
+    tiles_number: u64,
+    /// Controller addres
+    controller_address: String,
+}
 
 /// Adapter execute messages
 #[cosmwasm_schema::cw_serde]

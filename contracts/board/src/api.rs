@@ -13,10 +13,10 @@ use cosmwasm_std::{CosmosMsg, Deps, Uint128};
 
 // API for Abstract SDK users
 /// Interact with your adapter in other modules.
-pub trait MyAdapterApi: AccountIdentification + Dependencies + ModuleIdentification {
+pub trait BoardApi: AccountIdentification + Dependencies + ModuleIdentification {
     /// Construct a new adapter interface.
-    fn my_adapter<'a>(&'a self, deps: Deps<'a>) -> MyAdapter<Self> {
-        MyAdapter {
+    fn board<'a>(&'a self, deps: Deps<'a>) -> Board<Self> {
+        Board {
             base: self,
             deps,
             module_id: BOARD_ID,
@@ -24,16 +24,16 @@ pub trait MyAdapterApi: AccountIdentification + Dependencies + ModuleIdentificat
     }
 }
 
-impl<T: AccountIdentification + Dependencies + ModuleIdentification> MyAdapterApi for T {}
+impl<T: AccountIdentification + Dependencies + ModuleIdentification> BoardApi for T {}
 
 #[derive(Clone)]
-pub struct MyAdapter<'a, T: MyAdapterApi> {
+pub struct Board<'a, T: BoardApi> {
     pub base: &'a T,
     pub module_id: ModuleId<'a>,
     pub deps: Deps<'a>,
 }
 
-impl<'a, T: MyAdapterApi> MyAdapter<'a, T> {
+impl<'a, T: BoardApi> Board<'a, T> {
     /// Set the module id
     pub fn with_module_id(self, module_id: ModuleId<'a>) -> Self {
         Self { module_id, ..self }
@@ -58,7 +58,7 @@ impl<'a, T: MyAdapterApi> MyAdapter<'a, T> {
 }
 
 /// Queries
-impl<'a, T: MyAdapterApi> MyAdapter<'a, T> {
+impl<'a, T: BoardApi> Board<'a, T> {
     /// Query your adapter via message type
     pub fn query<R: DeserializeOwned>(&self, query_msg: BoardQueryMsg) -> AbstractSdkResult<R> {
         let adapters = self.base.adapters(self.deps);

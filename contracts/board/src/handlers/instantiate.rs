@@ -11,7 +11,7 @@ pub fn instantiate_handler(
     _env: Env,
     _info: MessageInfo,
     _adapter: BoardAdapter,
-    _msg: BoardInstantiateMsg,
+    msg: BoardInstantiateMsg,
 ) -> AdapterResult {
     let config: Config = Config {};
 
