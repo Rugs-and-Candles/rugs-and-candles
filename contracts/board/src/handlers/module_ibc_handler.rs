@@ -19,6 +19,7 @@ pub fn module_ibc_handler(
 
     let server_msg: BoardIbcMsg = from_json(&ibc_msg.msg)?;
 
+    
     match server_msg {
         BoardIbcMsg::RegisterAction { user, tile_number } => {
             let tile_id: TileId = tile_number;
@@ -28,6 +29,11 @@ pub fn module_ibc_handler(
 }
 
 fn handle_register_action(deps: DepsMut, user_addr: Addr, tile_id: TileId) -> BoardResult {
+    // TODO: Check if tile is rug or candle and in that case immediatey Proceed User
+    // switch
+
+
     ONGOING_ACTIONS.save(deps.storage, &user_addr, &tile_id)?;
     Ok(Response::new())
+    // TODO: Check if we dont need to add a ibc callback here
 }

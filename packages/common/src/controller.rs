@@ -48,3 +48,9 @@ pub struct ConfigResponse {}
 pub struct StatusResponse {
     pub status: Option<String>,
 }
+
+#[cosmwasm_schema::cw_serde]
+pub enum ControllerIbcMsg {
+    ProceedUser { client_user_address: String, tile_number: Option<u32> },
+}
+// TODO: Build handler for this message
