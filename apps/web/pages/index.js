@@ -1,14 +1,12 @@
 import React from 'react';
+import { Box } from '@chakra-ui/react';
 import Game from '../components/Game';
 
 const Home = () => {
   return (
-    <div>
-      <header>
-        <h1>Rugs and Candles Game</h1>
-      </header>
+    <Box textAlign="center" py={10}>
       <Game />
-    </div>
+    </Box>
   );
 };
 

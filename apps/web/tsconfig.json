@@ -14,7 +14,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "components/wallet/Warning.js", "components/wallet/Connect.js", "components/wallet/Chain.js"  ],
   "exclude": [
     "node_modules"
   ]

@@ -1,6 +1,6 @@
 use crate::{
     contract::AdapterResult,
-    state::{BOARD_IDS, CONFIG, STATUS},
+    state::{PositionRange, BOARD_IDS, CONFIG, STATUS},
 };
 
 use abstract_adapter::{

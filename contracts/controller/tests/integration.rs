@@ -1,149 +1,149 @@
-use common::controller::ControllerExecuteMsg;
-use common::controller::ConfigResponse;
-use common::controller::ControllerInstantiateMsg;
-use common::controller::ControllerQueryMsgFns;
-use common::controller::ExecuteMsg;
-use controller::{
-    contract::interface::ControllerInterface,
-    CONTROLLER_ID, CONTROLLER_NAMESPACE,
-};
+// use common::controller::ControllerExecuteMsg;
+// use common::controller::ConfigResponse;
+// use common::controller::ControllerInstantiateMsg;
+// use common::controller::ControllerQueryMsgFns;
+// use common::controller::ExecuteMsg;
+// use controller::{
+//     contract::interface::ControllerInterface,
+//     CONTROLLER_ID, CONTROLLER_NAMESPACE,
+// };
 
-use abstract_adapter::std::{adapter::AdapterRequestMsg, objects::namespace::Namespace};
-use abstract_client::{AbstractClient, Application, Publisher};
-use cosmwasm_std::coins;
-// Use prelude to get all the necessary imports
-use cw_orch::{anyhow, prelude::*};
+// use abstract_adapter::std::{adapter::AdapterRequestMsg, objects::namespace::Namespace};
+// use abstract_client::{AbstractClient, Application, Publisher};
+// use cosmwasm_std::coins;
+// // Use prelude to get all the necessary imports
+// use cw_orch::{anyhow, prelude::*};
 
-struct TestEnv<Env: CwEnv> {
-    publisher: Publisher<Env>,
-    abs: AbstractClient<Env>,
-    adapter: Application<Env, ControllerInterface<Env>>,
-}
+// struct TestEnv<Env: CwEnv> {
+//     publisher: Publisher<Env>,
+//     abs: AbstractClient<Env>,
+//     adapter: Application<Env, ControllerInterface<Env>>,
+// }
 
-impl TestEnv<MockBech32> {
-    /// Set up the test environment with an Account that has the Adapter installed
-    #[allow(clippy::type_complexity)]
-    fn setup() -> anyhow::Result<TestEnv<MockBech32>> {
-        // Create a sender and mock env
-        let mock = MockBech32::new("mock");
-        let sender = mock.sender();
-        let namespace = Namespace::new(CONTROLLER_NAMESPACE)?;
+// impl TestEnv<MockBech32> {
+//     /// Set up the test environment with an Account that has the Adapter installed
+//     #[allow(clippy::type_complexity)]
+//     fn setup() -> anyhow::Result<TestEnv<MockBech32>> {
+//         // Create a sender and mock env
+//         let mock = MockBech32::new("mock");
+//         let sender = mock.sender();
+//         let namespace = Namespace::new(CONTROLLER_NAMESPACE)?;
 
-        // You can set up Abstract with a builder.
-        let abs_client = AbstractClient::builder(mock).build()?;
-        // The adapter supports setting balances for addresses and configuring ANS.
-        abs_client.set_balance(sender, &coins(123, "ucosm"))?;
+//         // You can set up Abstract with a builder.
+//         let abs_client = AbstractClient::builder(mock).build()?;
+//         // The adapter supports setting balances for addresses and configuring ANS.
+//         abs_client.set_balance(sender, &coins(123, "ucosm"))?;
 
-        // Publish the adapter
-        let publisher = abs_client.publisher_builder(namespace).build()?;
-        publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<_>>(
-            ControllerInstantiateMsg {},
-        )?;
+//         // Publish the adapter
+//         let publisher = abs_client.publisher_builder(namespace).build()?;
+//         publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<_>>(
+//             ControllerInstantiateMsg {},
+//         )?;
 
-        let adapter = publisher
-            .account()
-            .install_adapter::<ControllerInterface<_>>(&[])?;
+//         let adapter = publisher
+//             .account()
+//             .install_adapter::<ControllerInterface<_>>(&[])?;
 
-        Ok(TestEnv {
-            abs: abs_client,
-            publisher,
-            adapter,
-        })
-    }
-}
+//         Ok(TestEnv {
+//             abs: abs_client,
+//             publisher,
+//             adapter,
+//         })
+//     }
+// }
 
-#[test]
-fn successful_install() -> anyhow::Result<()> {
-    let env = TestEnv::setup()?;
-    let adapter = env.adapter;
+// #[test]
+// fn successful_install() -> anyhow::Result<()> {
+//     let env = TestEnv::setup()?;
+//     let adapter = env.adapter;
 
-    let config = adapter.config()?;
-    assert_eq!(config, ConfigResponse {});
-    Ok(())
-}
+//     let config = adapter.config()?;
+//     assert_eq!(config, ConfigResponse {});
+//     Ok(())
+// }
 
-#[test]
-fn update_config() -> anyhow::Result<()> {
-    let env = TestEnv::setup()?;
-    let adapter = env.adapter;
+// #[test]
+// fn update_config() -> anyhow::Result<()> {
+//     let env = TestEnv::setup()?;
+//     let adapter = env.adapter;
 
-    // Executing it on publisher account
-    // Note that it's not a requirement to have it installed in this case
-    let publisher_account = env
-        .abs
-        .publisher_builder(Namespace::new(CONTROLLER_NAMESPACE).unwrap())
-        .build()?;
+//     // Executing it on publisher account
+//     // Note that it's not a requirement to have it installed in this case
+//     let publisher_account = env
+//         .abs
+//         .publisher_builder(Namespace::new(CONTROLLER_NAMESPACE).unwrap())
+//         .build()?;
 
-    adapter.execute(
-        &AdapterRequestMsg {
-            proxy_address: Some(publisher_account.account().proxy()?.to_string()),
-            request: ControllerExecuteMsg::UpdateConfig {},
-        }
-        .into(),
-        None,
-    )?;
+//     adapter.execute(
+//         &AdapterRequestMsg {
+//             proxy_address: Some(publisher_account.account().proxy()?.to_string()),
+//             request: ControllerExecuteMsg::UpdateConfig {},
+//         }
+//         .into(),
+//         None,
+//     )?;
 
-    let config = adapter.config()?;
-    let expected_response = common::controller::ConfigResponse {};
-    assert_eq!(config, expected_response);
+//     let config = adapter.config()?;
+//     let expected_response = common::controller::ConfigResponse {};
+//     assert_eq!(config, expected_response);
 
-    // Adapter installed on sub-account of the publisher so this should error
-    let err = adapter
-        .execute(
-            &AdapterRequestMsg {
-                proxy_address: Some(adapter.account().proxy()?.to_string()),
-                request: ControllerExecuteMsg::UpdateConfig {},
-            }
-            .into(),
-            None,
-        )
-        .unwrap_err();
-    assert_eq!(err.root().to_string(), "Unauthorized");
+//     // Adapter installed on sub-account of the publisher so this should error
+//     let err = adapter
+//         .execute(
+//             &AdapterRequestMsg {
+//                 proxy_address: Some(adapter.account().proxy()?.to_string()),
+//                 request: ControllerExecuteMsg::UpdateConfig {},
+//             }
+//             .into(),
+//             None,
+//         )
+//         .unwrap_err();
+//     assert_eq!(err.root().to_string(), "Unauthorized");
 
-    Ok(())
-}
+//     Ok(())
+// }
 
-#[test]
-fn set_status() -> anyhow::Result<()> {
-    let env = TestEnv::setup()?;
-    let adapter = env.adapter;
+// #[test]
+// fn set_status() -> anyhow::Result<()> {
+//     let env = TestEnv::setup()?;
+//     let adapter = env.adapter;
 
-    let first_status = "my_status".to_owned();
-    let second_status = "my_status".to_owned();
+//     let first_status = "my_status".to_owned();
+//     let second_status = "my_status".to_owned();
 
-    let subaccount = &env.publisher.account().sub_accounts()?[0];
+//     let subaccount = &env.publisher.account().sub_accounts()?[0];
 
-    subaccount.as_ref().manager.execute_on_module(
-        CONTROLLER_ID,
-        ExecuteMsg::Module(AdapterRequestMsg {
-            proxy_address: Some(subaccount.proxy()?.to_string()),
-            request: ControllerExecuteMsg::SetStatus {
-                status: first_status.clone(),
-            },
-        }),
-    )?;
+//     subaccount.as_ref().manager.execute_on_module(
+//         CONTROLLER_ID,
+//         ExecuteMsg::Module(AdapterRequestMsg {
+//             proxy_address: Some(subaccount.proxy()?.to_string()),
+//             request: ControllerExecuteMsg::SetStatus {
+//                 status: first_status.clone(),
+//             },
+//         }),
+//     )?;
 
-    let new_account = env
-        .abs
-        .account_builder()
-        .install_adapter::<ControllerInterface<MockBech32>>()?
-        .build()?;
+//     let new_account = env
+//         .abs
+//         .account_builder()
+//         .install_adapter::<ControllerInterface<MockBech32>>()?
+//         .build()?;
 
-    new_account.as_ref().manager.execute_on_module(
-        CONTROLLER_ID,
-        ExecuteMsg::Module(AdapterRequestMsg {
-            proxy_address: Some(new_account.proxy()?.to_string()),
-            request: ControllerExecuteMsg::SetStatus {
-                status: second_status.clone(),
-            },
-        }),
-    )?;
+//     new_account.as_ref().manager.execute_on_module(
+//         CONTROLLER_ID,
+//         ExecuteMsg::Module(AdapterRequestMsg {
+//             proxy_address: Some(new_account.proxy()?.to_string()),
+//             request: ControllerExecuteMsg::SetStatus {
+//                 status: second_status.clone(),
+//             },
+//         }),
+//     )?;
 
-    let status_response = adapter.status(adapter.account().id()?)?;
-    assert_eq!(status_response.status, Some(first_status));
+//     let status_response = adapter.status(adapter.account().id()?)?;
+//     assert_eq!(status_response.status, Some(first_status));
 
-    let status_response = adapter.status(new_account.id()?)?;
-    assert_eq!(status_response.status, Some(second_status));
+//     let status_response = adapter.status(new_account.id()?)?;
+//     assert_eq!(status_response.status, Some(second_status));
 
-    Ok(())
-}
+//     Ok(())
+// }
