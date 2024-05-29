@@ -5,7 +5,7 @@ use cw_controllers::AdminError;
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
-pub enum MyAdapterError {
+pub enum BoardError {
     #[error("{0}")]
     Std(#[from] StdError),
 
