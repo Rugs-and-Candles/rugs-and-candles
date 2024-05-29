@@ -1,12 +1,12 @@
 use crate::{
-    error::BoardError,
+    BoardError,
     handlers,
-    msg::{BoardExecuteMsg, BoardInstantiateMsg, BoardQueryMsg},
     BOARD_VERSION,
     BOARD_ID,
 };
 
-use abstract_adapter::AdapterContract;
+use common::board::*;
+
 use cosmwasm_std::Response;
 
 

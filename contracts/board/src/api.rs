@@ -1,5 +1,4 @@
 use crate::{
-    msg::{BoardExecuteMsg, BoardQueryMsg},
     BOARD_ID,
 };
 
@@ -8,6 +7,7 @@ use abstract_adapter::sdk::{
     AbstractSdkResult, AdapterInterface,
 };
 use abstract_adapter::std::objects::module::ModuleId;
+use common::board::{BoardExecuteMsg, BoardQueryMsg};
 use cosmwasm_schema::serde::de::DeserializeOwned;
 use cosmwasm_std::{CosmosMsg, Deps, Uint128};
 

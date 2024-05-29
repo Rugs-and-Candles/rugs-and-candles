@@ -8,8 +8,10 @@
 //! $ just publish uni-6 osmo-test-5
 //! ```
 use controller::{
-    contract::interface::MyAdapterInterface, msg::ControllerInstantiateMsg, CONTROLLER_ID,
+    contract::interface::MyAdapterInterface, CONTROLLER_ID,
 };
+
+use common::controller::ControllerInstantiateMsg;
 
 use abstract_adapter::objects::namespace::Namespace;
 use abstract_client::{AbstractClient, Publisher};

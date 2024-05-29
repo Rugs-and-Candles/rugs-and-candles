@@ -1,14 +1,13 @@
 use std::collections::HashMap;
 
 use crate::{
-    contract::{AdapterResult, BoardAdapter},
-    msg::BoardInstantiateMsg,
-    state::{Config, TileAction, CONFIG, TILES},
+    contract::AdapterResult,
+    state::{Config, CONFIG, TILES},
     BoardError,
 };
 
 use abstract_adapter::AdapterError;
-use common::game::Chains;
+use common::{board::{BoardAdapter, BoardInstantiateMsg, TileAction}, game::Chains};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 
 pub fn instantiate_handler(

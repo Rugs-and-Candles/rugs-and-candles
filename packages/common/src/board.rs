@@ -1,5 +1,5 @@
 
-use abstract_adapter::{objects::{chain_name::ChainName, AccountId}, AdapterContract};
+use abstract_adapter::{objects::AccountId, AdapterContract};
 use cosmwasm_schema::QueryResponses;
 use cosmwasm_std::Coin;
 
@@ -42,6 +42,8 @@ pub enum TileAction {
 
     /// Adapter execute messages
     #[cosmwasm_schema::cw_serde]
+    #[derive(cw_orch::ExecuteFns)]
+    #[impl_into(ExecuteMsg)]
     pub enum BoardExecuteMsg {
         /// Set status of your account
         SetStatus {
@@ -59,6 +61,7 @@ pub enum TileAction {
     /// Adapter query messages
     #[cosmwasm_schema::cw_serde]
     #[derive(QueryResponses, cw_orch::QueryFns)]
+    #[impl_into(QueryMsg)]
     pub enum BoardQueryMsg {
         #[returns(StatusResponse)]
         Status { account_id: AccountId },

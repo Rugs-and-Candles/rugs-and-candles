@@ -1,9 +1,9 @@
 use crate::{
-    contract::{AdapterResult, Controller},
-    msg::ControllerInstantiateMsg,
+    contract::{AdapterResult},
     state::{Config, CONFIG},
 };
 
+use common::controller::{Controller, ControllerInstantiateMsg};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 
 pub fn instantiate_handler(

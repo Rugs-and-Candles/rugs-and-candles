@@ -1,10 +1,10 @@
 use crate::{
-    contract::{AdapterResult, Controller},
-    msg::{ConfigResponse, ControllerQueryMsg, StatusResponse},
+    contract::{AdapterResult, },
     state::{CONFIG, STATUS},
 };
 
 use abstract_adapter::objects::AccountId;
+use common::controller::{ConfigResponse, Controller, ControllerQueryMsg, StatusResponse};
 use cosmwasm_std::{to_json_binary, Binary, Deps, Env, StdResult};
 
 pub fn query_handler(

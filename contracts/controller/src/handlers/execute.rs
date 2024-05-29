@@ -10,6 +10,8 @@ use abstract_adapter::{
 };
 use cosmwasm_std::{ensure_eq, Addr, DepsMut, Env, MessageInfo, Order, StdError};
 
+use super::module_ibc_handler::CallbackIds;
+
 pub fn execute_handler(
     deps: DepsMut,
     _env: Env,
@@ -60,24 +62,21 @@ fn set_status(deps: DepsMut, adapter: Controller, status: String) -> AdapterResu
 fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> AdapterResult {
     let account_registry = adapter.account_registry(deps.as_ref())?;
     let account_id = account_registry.account_id(adapter.target()?)?;
-
-
     let board_id_ranges = BOARD_IDS.range(deps.storage, None, None,Order::Ascending).next().ok_or(StdError::generic_err("No board found"))??;
-
     let start_tile_id = board_id_ranges.1.start();
 
-
-
+    let target_bech32_sender = "chain_prefix+address".to_string(); // TODO get the target bech32 address
 
     let message = adapter.ibc_client(deps.as_ref()).module_ibc_action(
         board_id_ranges.0.to_string(), 
         ModuleInfo::from_id_latest(BOARD_ID)?,
-        &{},
-        Some(CallbackInfo {id: "".to_string(), msg: None})
+        &common::board::BoardExecuteMsg::RegisterAction { user: target_bech32_sender, tile_number: 0 },
+        Some(CallbackInfo {id: CallbackIds::RegisterConfirm.into(), msg: None})
     );
 
 
     Ok(adapter
         .response("join")
-        .add_attribute("account_id", account_id.to_string()))
+        .add_attribute("account_id", account_id.to_string())
+    )
 }

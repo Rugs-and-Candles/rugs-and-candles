@@ -1,8 +1,7 @@
 use crate::{
-    contract::{AdapterResult, BoardAdapter},
-    msg::BoardExecuteMsg,
+    contract::{AdapterResult},
     state::{TileId, CONFIG, ONGOING_ACTIONS, STATUS, TILES},
-    BoardError, BOARD_NAMESPACE,
+    BoardError,
 };
 
 use abstract_adapter::{
@@ -11,6 +10,7 @@ use abstract_adapter::{
     std::IBC_CLIENT,
     traits::AbstractResponse,
 };
+use common::{board::{BoardAdapter, BoardExecuteMsg}, module_ids::RUGS_N_CANDLES_NAMESPACE};
 use cosmwasm_std::{ensure_eq, Addr, DepsMut, Env, MessageInfo};
 
 pub fn execute_handler(
@@ -34,7 +34,7 @@ fn update_config(deps: DepsMut, _msg_info: MessageInfo, adapter: BoardAdapter) -
     // Only admin(namespace owner) can change recipient address
     let namespace = adapter
         .module_registry(deps.as_ref())?
-        .query_namespace(Namespace::new(BOARD_NAMESPACE)?)?;
+        .query_namespace(Namespace::new(RUGS_N_CANDLES_NAMESPACE)?)?;
 
     // unwrap namespace, since it's unlikely to have unclaimed namespace as this adapter installed
     let namespace_info = namespace.unwrap();
@@ -86,7 +86,7 @@ fn perform_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> Ad
     let account_registry = adapter.account_registry(deps.as_ref())?;
 
     let account_id = account_registry.account_id(adapter.target()?)?;
-    STATUS.save(deps.storage, &account_id, "finished")?;
+    STATUS.save(deps.storage, &account_id, &"finished".to_string())?;
 
     let user_tile = ONGOING_ACTIONS.load(deps.storage, &info.sender)?;
     let user_action = TILES.load(deps.storage, user_tile)?;

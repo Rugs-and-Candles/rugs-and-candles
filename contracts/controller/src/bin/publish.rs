@@ -7,8 +7,9 @@
 //! ```bash
 //! $ just publish uni-6 osmo-test-5
 //! ```
+use common::controller::ControllerInstantiateMsg;
 use controller::{
-    contract::interface::MyAdapterInterface, msg::ControllerInstantiateMsg, CONTROLLER_ID,
+    contract::interface::MyAdapterInterface, CONTROLLER_ID,
 };
 
 use abstract_adapter::objects::namespace::Namespace;

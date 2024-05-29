@@ -7,11 +7,11 @@
 //! # Run
 //!
 //! `RUST_LOG=info cargo run --bin local_daemon --features="daemon-bin" --package my-adapter`
-use controller::{contract::interface::MyAdapterInterface, ControllerExecuteMsg, CONTROLLER_ID};
+use common::controller::{ControllerExecuteMsg, ControllerInstantiateMsg};
+use controller::{contract::interface::MyAdapterInterface, CONTROLLER_ID};
 
 use abstract_adapter::{objects::namespace::Namespace, std::adapter::AdapterRequestMsg};
 use abstract_client::{AbstractClient, Publisher};
-use controller::msg::ControllerInstantiateMsg;
 use cw_orch::{anyhow, prelude::*, tokio::runtime::Runtime};
 
 const LOCAL_MNEMONIC: &str = "clip hire initial neck maid actor venue client foam budget lock catalog sweet steak waste crater broccoli pipe steak sister coyote moment obvious choose";
@@ -61,7 +61,7 @@ fn main() -> anyhow::Result<()> {
     let adapter = account.install_adapter::<MyAdapterInterface<_>>(&[])?;
 
     // // Import adapter's endpoint function traits for easy interactions.
-    use controller::msg::MyAdapterQueryMsgFns;
+    use common::controller::ControllerQueryMsgFns;
     let status_response = adapter.status(adapter.account().id()?)?;
     assert!(status_response.status.is_none());
 

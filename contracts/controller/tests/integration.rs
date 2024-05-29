@@ -1,7 +1,10 @@
+use common::controller::ControllerExecuteMsg;
+use common::controller::ConfigResponse;
+use common::controller::ControllerInstantiateMsg;
+use common::controller::ControllerQueryMsgFns;
 use controller::{
     contract::interface::MyAdapterInterface,
-    msg::{ConfigResponse, ControllerInstantiateMsg, ExecuteMsg, MyAdapterQueryMsgFns},
-    ControllerExecuteMsg, CONTROLLER_ID, CONTROLLER_NAMESPACE,
+    CONTROLLER_ID, CONTROLLER_NAMESPACE,
 };
 
 use abstract_adapter::std::{adapter::AdapterRequestMsg, objects::namespace::Namespace};
@@ -80,7 +83,7 @@ fn update_config() -> anyhow::Result<()> {
     )?;
 
     let config = adapter.config()?;
-    let expected_response = controller::msg::ConfigResponse {};
+    let expected_response = common::controller::ConfigResponse {};
     assert_eq!(config, expected_response);
 
     // Adapter installed on sub-account of the publisher so this should error

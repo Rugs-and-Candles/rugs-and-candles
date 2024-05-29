@@ -2,11 +2,9 @@ pub mod api;
 pub mod contract;
 pub mod error;
 mod handlers;
-pub mod msg;
 pub mod state;
 
 pub use contract::interface::MyAdapterInterface;
-pub use error::ControllerError;
 
 /// The version of your Adapter
 pub const CONTROLLER_VERSION: &str = env!("CARGO_PKG_VERSION");

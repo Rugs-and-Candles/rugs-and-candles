@@ -7,11 +7,10 @@
 //! # Run
 //!
 //! `RUST_LOG=info cargo run --bin local_daemon --features="daemon-bin" --package my-adapter`
-use board::{contract::interface::BoardInterface, BoardExecuteMsg, BOARD_ID};
+use board::{contract::interface::BoardInterface, BoardExecuteMsg, BoardInstantiateMsg, BOARD_ID};
 
 use abstract_adapter::{objects::namespace::Namespace, std::adapter::AdapterRequestMsg};
 use abstract_client::{AbstractClient, Publisher};
-use board::msg::BoardInstantiateMsg;
 use cw_orch::{anyhow, prelude::*, tokio::runtime::Runtime};
 
 const LOCAL_MNEMONIC: &str = "clip hire initial neck maid actor venue client foam budget lock catalog sweet steak waste crater broccoli pipe steak sister coyote moment obvious choose";
@@ -51,7 +50,7 @@ fn main() -> anyhow::Result<()> {
 
     // Publish the Adapter to the Abstract Platform
     publisher
-        .publish_adapter::<BoardInstantiateMsg, BoardInterface<Daemon>>(BoardInstantiateMsg {})?;
+        .publish_adapter::<BoardInstantiateMsg, BoardInterface<Daemon>>(BoardInstantiateMsg { chain: todo!(), tiles_actions: todo!(), tiles_number: todo!(), controller_address: todo!() })?;
 
     // Install the Adapter on a new account
 
@@ -60,7 +59,7 @@ fn main() -> anyhow::Result<()> {
     let adapter = account.install_adapter::<BoardInterface<_>>(&[])?;
 
     // // Import adapter's endpoint function traits for easy interactions.
-    use board::msg::BoardQueryMsgFns;
+    use common::board::BoardQueryMsgFns;
     let status_response = adapter.status(adapter.account().id()?)?;
     assert!(status_response.status.is_none());
 
