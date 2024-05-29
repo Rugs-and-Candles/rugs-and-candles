@@ -1,13 +1,14 @@
 use crate::{
     contract::{AdapterResult, BoardAdapter},
     msg::BoardExecuteMsg,
-    state::{TileId, CONFIG, ONGOING_ACTIONS, STATUS},
+    state::{TileId, CONFIG, ONGOING_ACTIONS, STATUS, TILES},
     BoardError, BOARD_NAMESPACE,
 };
 
 use abstract_adapter::{
     objects::namespace::Namespace,
-    sdk::{AccountVerification, ModuleRegistryInterface},
+    sdk::{AccountVerification, ModuleInterface, ModuleRegistryInterface},
+    std::IBC_CLIENT,
     traits::AbstractResponse,
 };
 use cosmwasm_std::{ensure_eq, Addr, DepsMut, Env, MessageInfo};
@@ -66,12 +67,10 @@ fn start_action(
     user: String,
     tile_number: u32,
 ) -> AdapterResult {
-    let account_registry = adapter.account_registry(deps.as_ref())?;
+    // TODO: only controller
 
-    let account_id = account_registry.account_id(adapter.target()?)?;
-    STATUS.save(deps.storage, &account_id, "started")?;
+    // adapter.modules(deps.as_ref()).module_address(IBC_CLIENT);
 
-    // TODO: Implement this
     let user_addr = Addr::unchecked(user);
     let tile_id: TileId = tile_number;
     ONGOING_ACTIONS.save(deps.storage, &user_addr, &tile_id)?;
@@ -88,6 +87,9 @@ fn finish_action(deps: DepsMut, info: MessageInfo, adapter: BoardAdapter) -> Ada
 
     let account_id = account_registry.account_id(adapter.target()?)?;
     STATUS.save(deps.storage, &account_id, "finished")?;
+
+    let user_tile = ONGOING_ACTIONS.load(deps.storage, &info.sender)?;
+    let user_action = TILES.load(deps.storage, user_tile)?;
 
     Ok(adapter
         .response("finish_action")

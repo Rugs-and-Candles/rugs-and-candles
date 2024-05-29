@@ -29,5 +29,5 @@ pub const STATUS: Map<&AccountId, String> = Map::new("status");
 
 // game state
 pub const TILES: Map<TileId, TileAction> = Map::new("tiles");
-pub const MANAGER_ID: Item<AccountId> = Item::new("manager_id");
+pub const CONTROLLER_ID: Item<AccountId> = Item::new("controller_id");
 pub const ONGOING_ACTIONS: Map<&Addr, TileId> = Map::new("ongoing_actions");
