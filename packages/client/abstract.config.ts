@@ -5,14 +5,14 @@ export default defineConfig({
   out: 'src/generated',
   contracts: [
     {
-      name: "board-app", // name of adapter
+      name: "board", // name of adapter
       path: "../../contracts/board/schema/", // path to the schema of the adapter
       namespace: "rugspaceandcandles", // namespace
       version: "0.1.0",
       moduleType: "adapter",
     },
     {
-      name: "cotroller-app", // name of adapter
+      name: "controller", // name of adapter
       path: "../../contracts/controller/schema/", // path to the schema of the adapter
       namespace: "rugspaceandcandles", // namespace
       version: "0.1.0",

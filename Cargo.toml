@@ -4,7 +4,7 @@ exclude = [
   "packages/eslint-config",     # Exclude this specific crate
   "packages/typescript-config",
   "packages/ui",
-  "packages/client",
+  "packages/client"
 ]
 resolver = "2"
 

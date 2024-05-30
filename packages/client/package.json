@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npm build",
+    "build": "npm run build",
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
@@ -24,7 +24,6 @@
     "@emotion/styled": "^11.11.5",
     "@interchain-ui/react": "^1.23.13",
     "@keplr-wallet/types": "^0.12.95",
-    "@repo/ui": "*",
     "chain-registry": "^1.61.6",
     "cosmos-kit": "^2.15.1",
     "framer-motion": "^11.2.6",

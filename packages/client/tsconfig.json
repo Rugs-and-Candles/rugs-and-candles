@@ -1,9 +1,10 @@
 {
-  "extends": "@repo/typescript-config/nextjs.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "plugins": [
     ],
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "moduleResolution": "Node"
   },
   "include": [
     "next-env.d.ts",

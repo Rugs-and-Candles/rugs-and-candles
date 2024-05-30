@@ -13,7 +13,7 @@ state.json
 
 typescript/node_modules
 
-contracts/**/schema
+#contracts/**/schema
 
 *.cookie
 
