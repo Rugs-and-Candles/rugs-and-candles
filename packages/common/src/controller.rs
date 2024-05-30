@@ -1,5 +1,6 @@
 use abstract_adapter::{objects::AccountId, AdapterContract};
 use cosmwasm_schema::QueryResponses;
+use cosmwasm_std::Addr;
 
 use crate::errors::ControllerError;
 
@@ -42,6 +43,8 @@ pub enum ControllerQueryMsg {
     Config {},
     #[returns(UserPositionResponse)]
     UserPosition { user_address: String },
+    #[returns(ParticipantsResponse)]
+    Participants { }
 }
 
 #[cosmwasm_schema::cw_serde]
@@ -55,6 +58,11 @@ pub struct StatusResponse {
 #[cosmwasm_schema::cw_serde]
 pub struct UserPositionResponse {
     pub position: Option<u32>,
+}
+
+#[cosmwasm_schema::cw_serde]
+pub struct ParticipantsResponse {
+    pub participants: Vec<(Addr, u32)>,
 }
 
 #[cosmwasm_schema::cw_serde]
