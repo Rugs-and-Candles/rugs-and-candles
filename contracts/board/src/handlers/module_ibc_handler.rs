@@ -1,10 +1,12 @@
+use std::vec;
+
 use abstract_adapter::std::ibc::ModuleIbcMsg;
 use common::board::{BoardAdapter, BoardIbcMsg, TileAction};
 use common::module_ids::CONTROLLER_ID;
 use cosmwasm_std::{from_json, Addr, DepsMut, Env, Response};
 
 use crate::contract::BoardResult;
-use crate::state::{TileId, ONGOING_ACTIONS, TILES};
+use crate::state::{TileId, ONGOING_ACTIONS,  TILES};
 use crate::BoardError;
 
 use super::execute::match_tile_action_to_message;
@@ -59,7 +61,9 @@ fn handle_register_action(
             env,
         )?,
 
-        _ => vec![],
+        _ => {
+            vec![]
+        },
     };
 
     ONGOING_ACTIONS.save(deps.storage, &user_addr, &tile_id)?;
