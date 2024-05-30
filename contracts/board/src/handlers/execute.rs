@@ -74,6 +74,7 @@ fn perform_action(
     env: Env,
     adapter: BoardAdapter,
 ) -> BoardResult {
+    println!("Entered in the board");
     let account_registry = adapter.account_registry(deps.as_ref())?;
 
     let account_id = account_registry.account_id(adapter.target()?)?;

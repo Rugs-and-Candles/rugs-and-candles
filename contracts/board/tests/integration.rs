@@ -1,21 +1,13 @@
-use std::ops::Deref;
-
-use abstract_adapter::std::adapter::AdapterRequestMsg;
 use abstract_interchain_tests::setup::ibc_connect_abstract;
-use board::state::ONGOING_ACTIONS;
 use board::{
     ActionType, BoardInstantiateMsg, BoardInterface, BoardQueryMsgFns, RequiredAction, TileAction,
     RUGS_N_CANDLES_NAMESPACE,
 };
-use common::controller::{
-    ConfigResponse, ControllerExecuteMsg, ControllerExecuteMsgFns, ControllerInstantiateMsg,
-    ControllerQueryMsgFns,
-};
-use cosmwasm_std::{from_json, Api};
+use common::controller::{ControllerExecuteMsgFns, ControllerInstantiateMsg};
+use cosmwasm_std::Api;
 
 use abstract_adapter::std::objects::namespace::Namespace;
 use abstract_client::{AbstractClient, Application};
-use common::module_ids::CONTROLLER_ID;
 use controller::ControllerInterface;
 // Use prelude to get all the necessary imports
 use cw_orch::{anyhow, prelude::*};
@@ -36,8 +28,8 @@ impl TestEnv<MockBech32> {
     ) -> anyhow::Result<TestEnv<MockBech32>> {
         // Create mock chains
         let interchain =
-            MockBech32InterchainEnv::new(vec![("neutron-1", "ntrn"), ("kujira-1", "kuji")]);
-        let neutron = interchain.chain("neutron-1")?;
+            MockBech32InterchainEnv::new(vec![("juno-1", "juno"), ("kujira-1", "kuji")]);
+        let neutron = interchain.chain("juno-1")?;
         let kujira = interchain.chain("kujira-1")?;
 
         let namespace = Namespace::new(RUGS_N_CANDLES_NAMESPACE)?;
@@ -73,13 +65,13 @@ impl TestEnv<MockBech32> {
             .account()
             .install_adapter::<BoardInterface<_>>(&[])?;
 
-        ibc_connect_abstract(&interchain, "neutron-1", "kujira-1")?;
-        ibc_connect_abstract(&interchain, "kujira-1", "neutron-1")?;
+        ibc_connect_abstract(&interchain, "juno-1", "kujira-1")?;
+        ibc_connect_abstract(&interchain, "kujira-1", "juno-1")?;
 
         println!("Installation of Controller completed");
         let sender = neutron_controller.get_chain().addr_make("testuser");
         let tx_result = neutron_controller.call_as(&sender).join()?;
-        interchain.check_ibc("neutron-1", tx_result)?;
+        interchain.check_ibc("juno-1", tx_result)?;
 
         Ok(TestEnv {
             controller: neutron_controller,
@@ -91,7 +83,7 @@ impl TestEnv<MockBech32> {
 
 #[test]
 fn successful_install() -> anyhow::Result<()> {
-    let tiles_actions = vec![(0, TileAction::Action { action: None })];
+    let tiles_actions = vec![(1, TileAction::Action { action: None })];
     let env = TestEnv::setup("kujira".to_string(), tiles_actions.clone())?;
     let controller = env.controller;
 
@@ -121,7 +113,7 @@ fn successful_install() -> anyhow::Result<()> {
     //     )?
     //     .unwrap();
     let resp = env.board.ongoing_action_from_canonical(sender_canonical)?;
-    assert_eq!(resp.tile_id, 0);
+    assert_eq!(resp.tile_id, 1);
     assert_eq!(resp.action, tiles_actions[0].1);
     Ok(())
 }

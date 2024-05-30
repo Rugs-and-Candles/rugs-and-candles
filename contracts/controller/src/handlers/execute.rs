@@ -35,6 +35,7 @@ pub fn execute_handler(
 /// Join allows a user to participate to the rugs and candles game. This function returns an IBC
 /// message relayed to the board adapter to start the game.
 fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> ControllerResult {
+    println!("Calling the join");
     let (chain_name, position_range) = BOARD_IDS
         .range(deps.storage, None, None, Order::Ascending)
         .next()
@@ -55,6 +56,7 @@ fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> ControllerResult {
         None,
     )?;
 
+    println!("Sending the join message");
     Ok(adapter
         .response("join")
         .add_attribute("start_tile_id", start_tile_id.to_string())

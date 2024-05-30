@@ -1,9 +1,12 @@
 use crate::{
     contract::ControllerResult,
-    state::{BoardId, Config, PositionRange, BOARD_IDS, CONFIG},
+    state::{Config, PositionRange, BOARD_IDS, CONFIG},
 };
 
-use common::{config::controller_boards, controller::{Controller, ControllerInstantiateMsg}};
+use common::{
+    config::controller_boards,
+    controller::{Controller, ControllerInstantiateMsg},
+};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 
 pub fn instantiate_handler(

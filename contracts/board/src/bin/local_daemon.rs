@@ -7,14 +7,10 @@
 //! # Run
 //!
 //! `RUST_LOG=info cargo run --bin local_daemon --features="daemon-bin" --package my-adapter`
-use board::{
-    contract::interface::BoardInterface, ActionType, BoardExecuteMsg, BoardInstantiateMsg,
-    RequiredAction, TileAction, BOARD_ID,
-};
+use board::{contract::interface::BoardInterface, BoardExecuteMsg, BoardInstantiateMsg, BOARD_ID};
 
 use abstract_adapter::{objects::namespace::Namespace, std::adapter::AdapterRequestMsg};
 use abstract_client::{AbstractClient, Publisher};
-use cosmwasm_std::Uint128;
 use cw_orch::{anyhow, prelude::*, tokio::runtime::Runtime};
 
 const LOCAL_MNEMONIC: &str = "clip hire initial neck maid actor venue client foam budget lock catalog sweet steak waste crater broccoli pipe steak sister coyote moment obvious choose";

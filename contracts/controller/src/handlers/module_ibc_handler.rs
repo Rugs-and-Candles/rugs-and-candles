@@ -15,6 +15,7 @@ pub fn module_ibc_handler(
     adapter: Controller,
     ibc_msg: ModuleIbcMsg,
 ) -> ControllerResult<Response> {
+    println!("Answer received back");
     if ibc_msg.source_module.id().ne(BOARD_ID) {
         return Err(ControllerError::Unauthorized {});
     }

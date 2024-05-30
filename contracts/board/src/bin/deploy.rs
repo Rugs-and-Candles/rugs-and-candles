@@ -7,10 +7,7 @@
 //! # Run
 //!
 //! `RUST_LOG=info cargo run --bin local_daemon --features="daemon-bin" --package my-adapter`
-use board::{
-    contract::interface::BoardInterface, ActionType, BoardExecuteMsg, BoardInstantiateMsg,
-    RequiredAction, TileAction, BOARD_ID,
-};
+use board::{contract::interface::BoardInterface, BoardExecuteMsg, BoardInstantiateMsg, BOARD_ID};
 
 use abstract_adapter::{objects::namespace::Namespace, std::adapter::AdapterRequestMsg};
 use abstract_client::{AbstractClient, Publisher};
@@ -20,7 +17,6 @@ use networks::parse_network;
 
 const LOCAL_MNEMONIC: &str = "clip hire initial neck maid actor venue client foam budget lock catalog sweet steak waste crater broccoli pipe steak sister coyote moment obvious choose";
 
-
 fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
     env_logger::init();
@@ -29,7 +25,7 @@ fn main() -> anyhow::Result<()> {
     let chain_messages = board_chains_instantiate_msgs();
     for (chain_info, board_instantiate_msg) in chain_messages {
         let network = parse_network(&chain_info).unwrap();
-        // add logs for starting this chain 
+        // add logs for starting this chain
         println!("[CHAIN: {}] Start Board deployment...", network.chain_id);
 
         let daemon = Daemon::builder()
@@ -38,9 +34,9 @@ fn main() -> anyhow::Result<()> {
             .handle(runtime.handle())
             .build()
             .unwrap();
-    
+
         let adapter_namespace = Namespace::from_id(BOARD_ID)?;
-    
+
         // Create an [`AbstractClient`]
         // Note: AbstractClient Builder used because Abstract is not yet deployed on the chain
         let abstract_client: AbstractClient<Daemon> =
@@ -56,7 +52,7 @@ fn main() -> anyhow::Result<()> {
             "The current sender can not publish to this namespace. Please use the wallet that owns the Account that owns the Namespace."
         );
 
-        println!("[CHAIN: {}] publisher done", network.chain_id.to_string());
+        println!("[CHAIN: {}] publisher done", network.chain_id);
 
         // Publish the Adapter to the Abstract Platform
         publisher.publish_adapter::<BoardInstantiateMsg, BoardInterface<Daemon>>(
