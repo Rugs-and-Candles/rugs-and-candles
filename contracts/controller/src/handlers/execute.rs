@@ -1,7 +1,6 @@
 use crate::{
     contract::ControllerResult,
-    state::{BOARD_IDS, CONFIG, STATUS, PARTICIPANTS},
-
+    state::{BOARD_IDS, CONFIG, PARTICIPANTS, STATUS},
 };
 
 use abstract_adapter::{
@@ -51,7 +50,7 @@ fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> ControllerResult {
         ModuleInfo::from_id_latest(BOARD_ID)?,
         &common::board::BoardIbcMsg::RegisterAction {
             user: cannonical_sender.clone(),
-            tile_number: 0,
+            tile_number: 1,
         },
         None,
     )?;
