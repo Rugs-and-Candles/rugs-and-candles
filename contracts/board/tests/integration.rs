@@ -1,9 +1,17 @@
+use std::ops::Deref;
+
 use abstract_adapter::std::adapter::AdapterRequestMsg;
 use abstract_interchain_tests::setup::ibc_connect_abstract;
-use board::{BoardInstantiateMsg, BoardInterface, TileAction, RUGS_N_CANDLES_NAMESPACE};
-use common::controller::{
-    ConfigResponse, ControllerExecuteMsg, ControllerInstantiateMsg, ControllerQueryMsgFns,
+use board::state::ONGOING_ACTIONS;
+use board::{
+    ActionType, BoardInstantiateMsg, BoardInterface, RequiredAction, TileAction,
+    RUGS_N_CANDLES_NAMESPACE,
 };
+use common::controller::{
+    ConfigResponse, ControllerExecuteMsg, ControllerExecuteMsgFns, ControllerInstantiateMsg,
+    ControllerQueryMsgFns,
+};
+use cosmwasm_std::{from_json, Api};
 
 use abstract_adapter::std::objects::namespace::Namespace;
 use abstract_client::{AbstractClient, Application};
@@ -68,19 +76,9 @@ impl TestEnv<MockBech32> {
         ibc_connect_abstract(&interchain, "neutron-1", "kujira-1")?;
         ibc_connect_abstract(&interchain, "kujira-1", "neutron-1")?;
 
-        let abstract_account = neturn_abs_client
-            .account_builder()
-            .install_on_sub_account(false)
-            .build()?;
-        abstract_account.install_adapter::<ControllerInterface<_>>(&[])?;
         println!("Installation of Controller completed");
-        let tx_result = abstract_account.as_ref().manager.execute_on_module(
-            CONTROLLER_ID,
-            common::controller::ExecuteMsg::Module(AdapterRequestMsg {
-                proxy_address: Some(abstract_account.proxy()?.to_string()),
-                request: ControllerExecuteMsg::Join {},
-            }),
-        )?;
+        let sender = neutron_controller.get_chain().addr_make("testuser");
+        let tx_result = neutron_controller.call_as(&sender).join()?;
         interchain.check_ibc("neutron-1", tx_result)?;
 
         Ok(TestEnv {
@@ -98,38 +96,55 @@ fn successful_install() -> anyhow::Result<()> {
     let controller = env.controller;
     let config = controller.config()?;
 
-    assert_eq!(config, ConfigResponse {});
+    let sender = controller.get_chain().addr_make("testuser");
+    let sender_canonical = controller
+        .get_chain()
+        .app
+        .borrow()
+        .api()
+        .addr_canonicalize(sender.as_str())?;
+    let sender_humanized = env
+        .board
+        .get_chain()
+        .app
+        .borrow()
+        .api()
+        .addr_humanize(&sender_canonical)?;
+    let rep_unser = env
+        .board
+        .get_chain()
+        .app
+        .borrow()
+        .wrap()
+        .query_wasm_raw(
+            env.board.address()?,
+            ONGOING_ACTIONS.key(&sender_humanized).to_vec(),
+        )?
+        .unwrap();
+    let resp: u32 = from_json(rep_unser)?;
+    assert_eq!(resp, 0);
     Ok(())
 }
 
-// #[test]
-// fn basic_execute() -> anyhow::Result<()> {
-//     let env = TestEnv::setup()?;
-//     // let controller = env.controller;
-//     // let board = env.board;
-//     // let interchain = &env.interchain;
-//
-//     let TestEnv::<_> {
-//         controller,
-//         board,
-//         interchain,
-//     } = env;
-//     let controller_chain = controller.get_chain();
-//     let board_chain = board.get_chain();
-//
-//     let response = controller.join()?;
-//     let tx_result = controller
-//         .call_as(&controller_chain.addr_make("test1"))
-//         .join()?;
-//     interchain.check_ibc("neutron-1", tx_result)?;
-//
-//     let tx_result = board
-//         .call_as(&board_chain.addr_make("test1"))
-//         .perform_action()?;
-//     interchain.check_ibc("neutron-1", tx_result)?;
-//
-//     Ok(())
-// }
+#[test]
+fn basic_execute() -> anyhow::Result<()> {
+    let tiles_actions = vec![(
+        0,
+        TileAction::Action {
+            action: Some(RequiredAction {
+                required_funds: vec![Coin::new(1, "ukuji")],
+                actions: vec![ActionType::Lend],
+            }),
+        },
+    )];
+    let env = TestEnv::setup("kujira".to_string(), tiles_actions)?;
+    let controller = env.controller;
+    let config = controller.config()?;
+
+    assert_eq!(config, ConfigResponse {});
+
+    Ok(())
+}
 //
 // #[test]
 // fn test_rugg_or_candle_flow() -> anyhow::Result<()> {
@@ -184,92 +199,5 @@ fn successful_install() -> anyhow::Result<()> {
 //         "Action should fail if user is not registered"
 //     );
 //
-//     Ok(())
-// }
-
-// #[test]
-// fn update_config() -> anyhow::Result<()> {
-//     let env = TestEnv::setup()?;
-
-//     // Executing it on publisher account
-//     // Note that it's not a requirement to have it installed in this case
-//     let publisher_account = env
-//         .abs
-//         .publisher_builder(Namespace::new(RUGS_N_CANDLES_NAMESPACE).unwrap())
-//         .build()?;
-
-//     adapter.execute(
-//         &AdapterRequestMsg {
-//             proxy_address: Some(publisher_account.account().proxy()?.to_string()),
-//             request: ControllerExecuteMsg::UpdateConfig {},
-//         }
-//         .into(),
-//         None,
-//     )?;
-
-//     let config = adapter.config()?;
-//     let expected_response = common::controller::ConfigResponse {};
-//     assert_eq!(config, expected_response);
-
-//     // Adapter installed on sub-account of the publisher so this should error
-//     let err = adapter
-//         .execute(
-//             &AdapterRequestMsg {
-//                 proxy_address: Some(adapter.account().proxy()?.to_string()),
-//                 request: ControllerExecuteMsg::UpdateConfig {},
-//             }
-//             .into(),
-//             None,
-//         )
-//         .unwrap_err();
-//     assert_eq!(err.root().to_string(), "Unauthorized");
-
-//     Ok(())
-// }
-
-// #[test]
-// fn set_status() -> anyhow::Result<()> {
-//     let env = TestEnv::setup()?;
-//     let adapter = env.controller.set_status(
-//         "my_status".to_owned(),
-//     )?;
-
-//     let first_status = "my_status".to_owned();
-//     let second_status = "my_status".to_owned();
-
-//     let subaccount = &env.publisher.account().sub_accounts()?[0];
-
-//     subaccount.as_ref().manager.execute_on_module(
-//         CONTROLLER_ID,
-//         ExecuteMsg::Module(AdapterRequestMsg {
-//             proxy_address: Some(subaccount.proxy()?.to_string()),
-//             request: ControllerExecuteMsg::SetStatus {
-//                 status: first_status.clone(),
-//             },
-//         }),
-//     )?;
-
-//     let new_account = env
-//         .abs
-//         .account_builder()
-//         .install_adapter::<ControllerInterface<MockBech32>>()?
-//         .build()?;
-
-//     new_account.as_ref().manager.execute_on_module(
-//         CONTROLLER_ID,
-//         ExecuteMsg::Module(AdapterRequestMsg {
-//             proxy_address: Some(new_account.proxy()?.to_string()),
-//             request: ControllerExecuteMsg::SetStatus {
-//                 status: second_status.clone(),
-//             },
-//         }),
-//     )?;
-
-//     let status_response = adapter.status(adapter.account().id()?)?;
-//     assert_eq!(status_response.status, Some(first_status));
-
-//     let status_response = adapter.status(new_account.id()?)?;
-//     assert_eq!(status_response.status, Some(second_status));
-
 //     Ok(())
 // }
