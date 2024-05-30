@@ -6,7 +6,7 @@ use common::module_ids::CONTROLLER_ID;
 use cosmwasm_std::{from_json, Addr, DepsMut, Env, Response};
 
 use crate::contract::BoardResult;
-use crate::state::{TileId, ONGOING_ACTIONS,  TILES};
+use crate::state::{TileId, ONGOING_ACTIONS, TILES};
 use crate::BoardError;
 
 use super::execute::match_tile_action_to_message;
@@ -26,7 +26,6 @@ pub fn module_ibc_handler(
         BoardIbcMsg::RegisterAction { user, tile_number } => {
             let tile_id: TileId = tile_number;
             let user_addr = deps.api.addr_humanize(&user)?;
-
             handle_register_action(deps, env, module, user_addr, tile_id)
         }
     }
@@ -63,7 +62,7 @@ fn handle_register_action(
 
         _ => {
             vec![]
-        },
+        }
     };
 
     ONGOING_ACTIONS.save(deps.storage, &user_addr, &tile_id)?;

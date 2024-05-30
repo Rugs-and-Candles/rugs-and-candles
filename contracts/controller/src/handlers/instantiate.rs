@@ -3,7 +3,10 @@ use crate::{
     state::{BoardId, Config, PositionRange, BOARD_IDS, CONFIG},
 };
 
-use common::controller::{Controller, ControllerInstantiateMsg};
+use common::{
+    config::controller_boards,
+    controller::{Controller, ControllerInstantiateMsg},
+};
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 
 pub fn instantiate_handler(
@@ -18,11 +21,12 @@ pub fn instantiate_handler(
 
     CONFIG.save(deps.storage, &config)?;
 
-    let board_id: BoardId = "harpoon".to_string();
-    let board_range = PositionRange::new(1, 10);
-    println!("Init vars");
+    let controller_boards = controller_boards();
+    for (board_id, board_range) in controller_boards {
+        let range = PositionRange::new(board_range.start, board_range.end);
+        BOARD_IDS.save(deps.storage, &board_id, &range)?;
+    }
 
-    BOARD_IDS.save(deps.storage, &board_id, &board_range)?;
     println!("Completed Controller instantiation");
     Ok(Response::new())
 }

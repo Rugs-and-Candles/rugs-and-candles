@@ -1,0 +1,19 @@
+{
+  "extends": "@repo/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "plugins": [
+    ],
+    "strictNullChecks": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "next.config.js",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+, "components/wallet/Warning.js", "components/wallet/Connect.js", "components/wallet/Chain.js"  ],
+  "exclude": [
+    "node_modules",
+    "abstract.config.ts"
+  ]
+}

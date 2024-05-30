@@ -1,6 +1,6 @@
 use crate::{
     contract::ControllerResult,
-    state::{BOARD_IDS, CONFIG, STATUS},
+    state::{BOARD_IDS, CONFIG, PARTICIPANTS, STATUS},
 };
 
 use abstract_adapter::{
@@ -41,6 +41,8 @@ fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> ControllerResult {
         .ok_or(StdError::generic_err("No board found"))??;
     let start_tile_id = position_range.start();
 
+    PARTICIPANTS.save(deps.storage, &sender, &start_tile_id)?;
+
     let cannonical_sender = deps.api.addr_canonicalize(sender.as_str())?;
 
     let message = adapter.ibc_client(deps.as_ref()).module_ibc_action(
@@ -48,7 +50,7 @@ fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> ControllerResult {
         ModuleInfo::from_id_latest(BOARD_ID)?,
         &common::board::BoardIbcMsg::RegisterAction {
             user: cannonical_sender.clone(),
-            tile_number: 0,
+            tile_number: 1,
         },
         None,
     )?;

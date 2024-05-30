@@ -28,7 +28,7 @@ name = "publish"
 required-features = ["daemon-bin"]
 
 [[bin]]
-name = "local_daemon"
+name = "deploy"
 required-features = ["daemon-bin"]
 
 [features]
@@ -71,3 +71,4 @@ abstract-interchain-tests = "0.22.1"
 board = { workspace = true }
 abstract-client = { workspace = true }
 abstract-adapter = { workspace = true, features = ["test-utils"] }
+log = "0.4.21"

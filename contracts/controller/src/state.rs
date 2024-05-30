@@ -22,8 +22,8 @@ pub const PARTICIPANTS: Map<&Addr, Position> = Map::new("participants");
 /// A inclusive range of positions on the board
 #[cosmwasm_schema::cw_serde]
 pub struct PositionRange {
-    start: Position,
-    end: Position,
+    pub start: Position,
+    pub end: Position,
 }
 
 /// The id of the board is represented by the name of the chain.
@@ -31,7 +31,7 @@ pub type BoardId = String;
 
 /// Stores the tiles associated to every chain in which a board is present.
 // pub const BOARD_IDS: Map<&BoardId, PositionRange> = Map::new("board_ids");
-pub const BOARD_IDS: Map<&BoardId, PositionRange> = Map::new("board_ids");
+pub const BOARD_IDS: Map<&str, PositionRange> = Map::new("board_ids");
 
 /// Create a new position range.
 impl PositionRange {

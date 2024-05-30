@@ -163,17 +163,48 @@ fn basic_execute() -> anyhow::Result<()> {
             }),
         },
     )];
-    let env = TestEnv::setup("harpoon".to_string(), tiles_actions)?;
+    let env = TestEnv::setup("harpoon".to_string(), tiles_actions.clone())?;
     let controller = env.controller;
-    let config = controller.config()?;
+    let board = env.board;
 
-    assert_eq!(config, ConfigResponse {});
+    let sender = controller.get_chain().addr_make("testuser");
+    let sender_canonical = controller
+        .get_chain()
+        .app
+        .borrow()
+        .api()
+        .addr_canonicalize(sender.as_str())?;
 
+    let resp = board.ongoing_action_from_canonical(sender_canonical)?;
+    assert_eq!(resp.tile_id, 0);
+    assert_eq!(resp.action, tiles_actions[0].1);
     Ok(())
 }
 
 #[test]
 fn test_rugg_or_candle_flow() -> anyhow::Result<()> {
+    let tiles_actions = vec![(0, TileAction::Candle { n_tile: 3 })];
+    let env = TestEnv::setup("harpoon".to_string(), tiles_actions.clone())?;
+    let controller = env.controller;
+    let board = env.board;
+
+    let sender = controller.get_chain().addr_make("testuser");
+    let sender_canonical = controller
+        .get_chain()
+        .app
+        .borrow()
+        .api()
+        .addr_canonicalize(sender.as_str())?;
+
+    let resp = board.ongoing_action_from_canonical(sender_canonical)?;
+    assert_eq!(resp.tile_id, 0);
+    assert_eq!(resp.action, tiles_actions[0].1);
+
+    Ok(())
+}
+
+#[test]
+fn test_rugg_or_candle_flow_2() -> anyhow::Result<()> {
     let tiles_actions = vec![(
         0,
         TileAction::Action {
