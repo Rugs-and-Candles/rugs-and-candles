@@ -1,5 +1,7 @@
 # Rugs and Candles: The Interchain Board Game
 
+![image](https://github.com/Rugs-and-Candles/rugs-and-candles/assets/80094928/7d11a646-fc51-4b98-aa99-cfb337fc35c8)
+
 ## Overview
 
 Rugs and Candles is an interactive board game built with React and Chakra UI, integrated with Cosmos Kit for seamless wallet connections. The game features a dynamic board that spans multiple Cosmos chains, allowing players to experience various chain-specific actions and events.
