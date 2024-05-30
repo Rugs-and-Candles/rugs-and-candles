@@ -168,7 +168,7 @@ fn create_lending_message(
     deps: Deps,
     env: Env,
     adapter: &BoardAdapter,
-    user: &Addr,
+    _user: &Addr,
     required_funds: Vec<Coin>,
     added_funds: Vec<Coin>,
 ) -> Result<Vec<SubMsg>, BoardError> {

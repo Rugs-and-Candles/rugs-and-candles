@@ -1,3 +1,5 @@
+mod deploy;
+
 use common::controller::Controller;
 use cosmwasm_schema::remove_schemas;
 use std::env::current_dir;

@@ -26,7 +26,7 @@ fn main() -> anyhow::Result<()> {
     let runtime = Runtime::new()?;
 
     let daemon = Daemon::builder()
-        .chain(networks::LOCAL_JUNO)
+        .chain(networks::PION_1)
         .mnemonic(LOCAL_MNEMONIC)
         .handle(runtime.handle())
         .build()
@@ -54,7 +54,9 @@ fn main() -> anyhow::Result<()> {
 
     // Publish the Adapter to the Abstract Platform
     publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<Daemon>>(
-        ControllerInstantiateMsg {},
+        ControllerInstantiateMsg {
+            // NOTE: The boards that are part of the game are hardcoded in the instantiate message.
+        },
     )?;
 
     // Install the Adapter on a new account
@@ -87,6 +89,7 @@ fn main() -> anyhow::Result<()> {
 
     // Note: the Adapter is installed on a sub-account of the main account!
     assert_ne!(account.id()?, adapter.account().id()?);
+
 
     Ok(())
 }
