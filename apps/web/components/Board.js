@@ -11,11 +11,14 @@ const chainThemes = {
 
 const candles = [
   { type: 'green', start: 2, span: 3 },
+  { type: 'green', start: 8, span: 2 },
   { type: 'red', start: 14, span: 2 },
   { type: 'green', start: 27, span: 3 },
   { type: 'green', start: 19, span: 3 },
   { type: 'red', start: 35, span: 3 },
   { type: 'red', start: 41, span: 3 },
+  { type: 'red', start: 43, span: 2 },
+
 ];
 
 const actionIcons = {
@@ -24,7 +27,7 @@ const actionIcons = {
   7: '/icons/orca.png',
   9: 'icons/fin.png',
   16: 'icons/prop32.png',
-  23: 'icons/leverage.png',
+  23: 'icons/levana.png',
   28: 'icons/liquidity.png',
   32: 'icons/smart-contract.png',
   36: 'icons/swap.png',
@@ -102,7 +105,7 @@ const Board = ({ gameState, playerPosition, onPlayerMove }) => {
                         width="80px"
                         height="auto"
                         maxHeight={`${candle.span * 100}px`}
-                        opacity=".8"
+                        opacity=".7"
                         zIndex="20"
                         style={{
                           objectFit: 'cover',

@@ -29,11 +29,13 @@ export const movePlayer = (currentPosition, diceRoll) => {
   // Handle snakes and ladders
   const snakesAndLadders = {
     2: 22,
+    8: 18, 
     14: 4,
     19: 39,
     27: 47,
     35: 15,
     41: 21,
+    43: 33,
   };
 
   return snakesAndLadders[newPosition] || newPosition;
