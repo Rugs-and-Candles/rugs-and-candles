@@ -49,7 +49,7 @@ Rugs and Candles is an interactive board game built with React and Chakra UI, in
 - **Tile 9**: Swap on FIN
 - **Tile 16**: Proposal 16
 - **Tile 23**: Leverage trade on Levana 
-- **Tile 28**: Provide liquidity on Osnmosis
+- **Tile 28**: Provide liquidity on Osmosis
 - **Tile 32**: Instantiate a smart contract
 - **Tile 36**: Steady Lads, Deploying Funds
 - **Tile 44**: Mint an NFT
