@@ -137,48 +137,46 @@ fn basic_execute() -> anyhow::Result<()> {
             }),
         },
     )];
-    let env = TestEnv::setup("kujira".to_string(), tiles_actions)?;
+    let env = TestEnv::setup("kujira".to_string(), tiles_actions.clone())?;
     let controller = env.controller;
-    let config = controller.config()?;
+    let board = env.board;
 
-    assert_eq!(config, ConfigResponse {});
+    let sender = controller.get_chain().addr_make("testuser");
+    let sender_canonical = controller
+        .get_chain()
+        .app
+        .borrow()
+        .api()
+        .addr_canonicalize(sender.as_str())?;
+
+    let resp = board.ongoing_action_from_canonical(sender_canonical)?;
+    assert_eq!(resp.tile_id, 0);
+    assert_eq!(resp.action, tiles_actions[0].1);
+    Ok(())
+}
+
+#[test]
+fn test_rugg_or_candle_flow() -> anyhow::Result<()> {
+    let tiles_actions = vec![(0, TileAction::Candle { n_tile: 3 })];
+    let env = TestEnv::setup("kujira".to_string(), tiles_actions.clone())?;
+    let controller = env.controller;
+    let board = env.board;
+
+    let sender = controller.get_chain().addr_make("testuser");
+    let sender_canonical = controller
+        .get_chain()
+        .app
+        .borrow()
+        .api()
+        .addr_canonicalize(sender.as_str())?;
+
+    let resp = board.ongoing_action_from_canonical(sender_canonical)?;
+    assert_eq!(resp.tile_id, 0);
+    assert_eq!(resp.action, tiles_actions[0].1);
 
     Ok(())
 }
-//
-// #[test]
-// fn test_rugg_or_candle_flow() -> anyhow::Result<()> {
-//     let env = TestEnv::setup()?;
-//     let TestEnv::<_> {
-//         controller,
-//         board,
-//         interchain,
-//     } = env;
-//     let controller_chain = controller.get_chain();
-//     let board_chain = board.get_chain();
-//
-//     // User registration
-//     let response = controller.join()?;
-//     let tx_result = controller
-//         .call_as(&controller_chain.addr_make("test1"))
-//         .join()?;
-//     interchain.check_ibc("neutron-1", tx_result)?;
-//
-//     // Mock 'Rugg' condition and verify handling
-//     let tx_result = board
-//         .call_as(&board_chain.addr_make("test1"))
-//         .perform_action()?;
-//     assert!(false);
-//
-//     // Mock 'Candle' condition and verify handling
-//     let tx_result = board
-//         .call_as(&board_chain.addr_make("test1"))
-//         .perform_action()?;
-//     assert!(false);
-//
-//     Ok(())
-// }
-//
+
 // #[test]
 // fn test_invalid_conditions() -> anyhow::Result<()> {
 //     let env = TestEnv::setup()?;

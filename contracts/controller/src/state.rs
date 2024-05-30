@@ -31,7 +31,7 @@ pub type BoardId = String;
 
 /// Stores the tiles associated to every chain in which a board is present.
 // pub const BOARD_IDS: Map<&BoardId, PositionRange> = Map::new("board_ids");
-pub const BOARD_IDS: Map<&BoardId, PositionRange> = Map::new("board_ids");
+pub const BOARD_IDS: Map<&str, PositionRange> = Map::new("board_ids");
 
 /// Create a new position range.
 impl PositionRange {
