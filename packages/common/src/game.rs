@@ -15,7 +15,8 @@ impl From<&String> for Chains {
     fn from(s: &String) -> Self {
         match s.to_lowercase().as_str() {
             "neutron" => Chains::Neutron,
-            "kujira" => Chains::Kujira,
+            "harpoon" => Chains::Kujira,
+            "kaiyo" => Chains::Kujira,
             "osmosis" => Chains::Osmosis,
             "stargaze" => Chains::Stargaze,
             _ => Chains::NonSupported,

@@ -3,7 +3,10 @@ use crate::{
     state::{CONFIG, ONGOING_ACTIONS, STATUS, TEMP_USER, TILES},
     BoardError,
 };
-use abstract_money_market_adapter::msg::{MoneyMarketExecuteMsg, MoneyMarketQueryMsg};
+use abstract_money_market_adapter::{
+    msg::{GenerateMessagesResponse, MoneyMarketExecuteMsg, MoneyMarketQueryMsg},
+    MONEY_MARKET_ADAPTER_ID,
+};
 
 use abstract_adapter::traits::AbstractNameService;
 use abstract_adapter::{
@@ -76,8 +79,8 @@ fn perform_action(
 ) -> BoardResult {
     let account_registry = adapter.account_registry(deps.as_ref())?;
 
-    let account_id = account_registry.account_id(adapter.target()?)?;
-    STATUS.save(deps.storage, &account_id, &"finished".to_string())?;
+    // let account_id = account_registry.account_id(adapter.target()?)?;
+    // STATUS.save(deps.storage, &account_id, &"finished".to_string())?;
 
     let user_tile = ONGOING_ACTIONS.load(deps.storage, &info.sender)?;
     let tile_action = TILES.load(deps.storage, user_tile)?;
@@ -86,7 +89,7 @@ fn perform_action(
 
     let msgs =
         match_tile_action_to_message(tile_action, &deps, &adapter, &sender, funds, user_tile, env)?;
-        
+
     TEMP_USER.save(deps.storage, &info.sender)?;
     ONGOING_ACTIONS.remove(deps.storage, &info.sender);
 
@@ -98,8 +101,7 @@ fn perform_action(
             format!("{} form{}", info.sender, user_tile),
         )
         .add_attribute("tile_id", user_tile.to_string())
-        .add_submessages(msgs)
-        .add_attribute("account_id", account_id.to_string()))
+        .add_submessages(msgs))
 }
 
 pub fn match_tile_action_to_message(
@@ -179,9 +181,9 @@ fn create_lending_message(
         )));
     }
 
-    if required_funds.eq(&added_funds) {
+    if required_funds.ne(&added_funds) {
         return Err(BoardError::Std(StdError::generic_err(
-            "The required funds are already added",
+            "Wrong funds added (The required funds are already added)",
         )));
     }
 
@@ -191,18 +193,32 @@ fn create_lending_message(
     let ans_asset = adapter.name_service(deps).query(&asset)?;
 
     let money_market_name = "ghost".to_string();
-    let money_market = adapter.ans_money_market(deps, money_market_name.clone());
 
-    let deposit_msg: CosmosMsg = money_market.query(MoneyMarketQueryMsg::GenerateMessages {
-        message: MoneyMarketExecuteMsg::AnsAction {
-            money_market: money_market_name,
-            action: MoneyMarketAnsAction::Deposit {
-                lending_asset: ans_asset,
+    // Creating the money market adapter message (fix because we're not using accounts)
+    let adapter_query: abstract_adapter::std::adapter::QueryMsg<_> =
+        MoneyMarketQueryMsg::GenerateMessages {
+            message: MoneyMarketExecuteMsg::AnsAction {
+                money_market: money_market_name,
+                action: MoneyMarketAnsAction::Deposit {
+                    lending_asset: ans_asset,
+                },
             },
-        },
-        addr_as_sender: env.contract.address.to_string(),
-    })?;
+            addr_as_sender: env.contract.address.to_string(),
+        }
+        .into();
+    let mm_address = adapter
+        .module_registry(deps)?
+        .query_module(ModuleInfo::from_id_latest(MONEY_MARKET_ADAPTER_ID)?)?
+        .reference
+        .unwrap_adapter()?;
+    let deposit_msg: GenerateMessagesResponse =
+        deps.querier.query_wasm_smart(mm_address, &adapter_query)?;
 
-    let sub_msg = SubMsg::reply_on_success(deposit_msg, 0);
-    Ok([sub_msg].to_vec())
+    let sub_msg = deposit_msg
+        .messages
+        .into_iter()
+        .map(|m| SubMsg::reply_on_success(m, 0))
+        .collect();
+
+    Ok(sub_msg)
 }

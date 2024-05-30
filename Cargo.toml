@@ -1,7 +1,7 @@
 [workspace]
 members = ["contracts/*", "packages/*"]
 exclude = [
-    "packages/eslint-config", # Exclude this specific crate
+  "packages/eslint-config",     # Exclude this specific crate
   "packages/typescript-config",
   "packages/ui",
 ]
@@ -32,10 +32,9 @@ abstract-interface = { version = "0.22.0" }
 abstract-client = { version = "0.22.0" }
 lazy_static = "1.4.0"
 # abstract-money-market-adapter = { git = "https://github.com/AbstractSDK/abstract.git", branch = "removemm", default-features = false }
-abstract-money-market-adapter = { git = "https://github.com/AbstractSDK/abstract.git", rev = "184798a", default-features = false }
-abstract-money-market-standard = {version = "0.22.0"}
+abstract-money-market-adapter = { git = "https://github.com/AbstractSDK/abstract.git", rev = "ca7e2cb", default-features = false }
+abstract-money-market-standard = { version = "0.22.0" }
 # abstract-money-market-adapter = { version = "0.22.0", default-features = false }
-
 
 
 cw-orch = { version = "0.22.2" }

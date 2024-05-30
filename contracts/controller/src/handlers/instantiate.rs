@@ -18,7 +18,7 @@ pub fn instantiate_handler(
 
     CONFIG.save(deps.storage, &config)?;
 
-    let board_id: BoardId = "kujira".to_string();
+    let board_id: BoardId = "harpoon".to_string();
     let board_range = PositionRange::new(1, 10);
     println!("Init vars");
 
