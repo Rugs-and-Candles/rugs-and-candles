@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { Box, SimpleGrid, Image, Text, keyframes } from '@chakra-ui/react';
 
 const chainThemes = {
-  neutron: { bg: 'blue.800', icon: '/icons/neutron.png' },
-  kuji: { bg: 'red.100', icon: '/icons/kuji.png' },
+  stargaze: { bg: 'linear-gradient(to right, yellow, teal, green)', icon: '/icons/stargaze.png' },
+  kuji: { bg: 'red.400', icon: '/icons/kuji.png' },
   juno: { bg: 'peachpuff', icon: '/icons/juno.png' },
-  archway: { bg: 'yellow.100', icon: '/icons/archway.png' },
+  archway: { bg: 'orange.500', icon: '/icons/archway.png' },
   osmosis: { bg: 'purple.500', icon: '/icons/osmosis.png' },
 };
 
@@ -18,12 +18,26 @@ const candles = [
   { type: 'red', start: 41, span: 3 },
 ];
 
+const actionIcons = {
+  3: '/icons/usk.png',
+  5: '/icons/kujira-ghost.png',
+  7: '/icons/orca.png',
+  9: 'icons/fin.png',
+  16: 'icons/prop32.png',
+  23: 'icons/leverage.png',
+  28: 'icons/liquidity.png',
+  32: 'icons/smart-contract.png',
+  36: 'icons/swap.png',
+  44: 'icons/nft.png',
+  50: 'icons/finish.png'
+};
+
 const getChainFromIndex = (index) => {
-  if (index < 10) return 'neutron';
-  if (index < 20) return 'kuji';
-  if (index < 30) return 'juno';
+  if (index < 10) return 'kuji';
+  if (index < 20) return 'juno';
+  if (index < 30) return 'osmosis';
   if (index < 40) return 'archway';
-  return 'osmosis';
+  return 'stargaze';
 };
 
 const slideAnimation = keyframes`
@@ -60,6 +74,7 @@ const Board = ({ gameState, playerPosition, onPlayerMove }) => {
                 const globalIndex = rowIndex * 10 + index + 1; // Adjusting index to match tile numbers
                 const candle = candles.find(c => c.start === globalIndex);
                 const isPlayerHere = globalIndex === playerPosition;
+                const actionIcon = actionIcons[globalIndex];
                 return (
                   <Box
                     key={index}
@@ -84,20 +99,31 @@ const Board = ({ gameState, playerPosition, onPlayerMove }) => {
                         bottom={candle.type === 'green' ? '0' : 'auto'}
                         left="50%"
                         transform="translateX(-50%)"
-                        width="70px"
+                        width="80px"
                         height="auto"
                         maxHeight={`${candle.span * 100}px`}
-                        opacity="0.85"
-                        zIndex="10"
+                        opacity=".8"
+                        zIndex="20"
                         style={{
                           objectFit: 'cover',
                           height: `${candle.span * 100}px`,
                         }}
                       />
                     )}
-                    <Text fontFamily="Arial, sans-serif" fontSize="lg" fontWeight="bold" color={chain === 'neutron' ? 'white' : 'black'} zIndex="modal">
-                      {globalIndex}
-                    </Text>
+                    {actionIcon && (
+                      <Image
+                        src={actionIcon}
+                        alt="Action Icon"
+                        position="absolute"
+                        top="50%"
+                        left="50%"
+                        transform="translate(-50%, -50%)"
+                        width="70px"
+                        height="70px"
+                        opacity="1"
+                        zIndex="30"
+                      />
+                    )}
                     {isPlayerHere && (
                       <Image
                         src={playerIcon}
@@ -106,11 +132,25 @@ const Board = ({ gameState, playerPosition, onPlayerMove }) => {
                         top="50%"
                         left="50%"
                         transform="translate(-50%, -50%)"
-                        boxSize="60px"
+                        boxSize="70px"
                         zIndex="modal"
                         animation={`${slideAnimation} 1s ease-in-out`}
                       />
                     )}
+                    <Text
+                      position="absolute"
+                      bottom="2px"
+                      width="100%"
+                      left="36%"
+                      textAlign="center"
+                      fontFamily="Arial, sans-serif"
+                      fontSize="lg"
+                      fontWeight="bold"
+                      color={chain === 'neutron' ? 'white' : 'black'}
+                      zIndex="20"
+                    >
+                      {globalIndex}
+                    </Text>
                   </Box>
                 );
               })}

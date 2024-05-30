@@ -23,6 +23,7 @@
   ],
   "dependencies": {
     "@abstract-money/cli": "^0.4.1",
+    "@fontsource/poppins": "^5.0.14",
     "match-sorter": "^6.3.4"
   }
 }

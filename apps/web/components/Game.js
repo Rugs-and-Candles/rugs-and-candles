@@ -10,10 +10,11 @@ const Game = () => {
   const [account, setAccount] = useState(null);
   const [chainName, setChainName] = useState(CHAIN_NAME);
 
+// this is where chainName gets updated
   function onChainChange(chainName) {
     setChainName(chainName);
   }
-  
+
   useEffect(() => {
     const initGame = async () => {
       const initialState = await fetchInitialGameState();
@@ -50,7 +51,7 @@ const Game = () => {
           </Heading>
         </Flex>
         <WalletButton 
-          colorScheme="teal"
+          colorScheme="black"
           size="lg"
           chainName={chainName}
           onChainChange={onChainChange}

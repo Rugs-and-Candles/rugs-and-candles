@@ -21,7 +21,7 @@ function MyApp({ Component, pageProps }) {
   };
 
   return (
-    <ThemeProvider>
+    <ThemeProvider themeClass={themeClass} themeMode={'light'}>
       <ChainProvider
         chains={chains}
         assetLists={assets}
