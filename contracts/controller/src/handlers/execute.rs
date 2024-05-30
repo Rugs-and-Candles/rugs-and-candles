@@ -1,10 +1,7 @@
 use crate::{
     contract::ControllerResult,
-<<<<<<< HEAD
-    state::{BOARD_IDS, CONFIG, STATUS},
-=======
-    state::{PositionRange, BOARD_IDS, CONFIG, PARTICIPANTS, STATUS},
->>>>>>> 1a15662 (bbbb)
+    state::{BOARD_IDS, CONFIG, STATUS, PARTICIPANTS},
+
 };
 
 use abstract_adapter::{

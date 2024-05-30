@@ -14,7 +14,6 @@ use board::{
 
 use abstract_adapter::{objects::namespace::Namespace, std::adapter::AdapterRequestMsg};
 use abstract_client::{AbstractClient, Publisher};
-use cosmwasm_std::Uint128;
 use common::{board::BoardQueryMsgFns, config::board_chains_instantiate_msgs};
 use cw_orch::{anyhow, prelude::*, tokio::runtime::Runtime};
 use networks::parse_network;
