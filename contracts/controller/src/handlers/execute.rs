@@ -1,6 +1,10 @@
 use crate::{
     contract::ControllerResult,
+<<<<<<< HEAD
     state::{BOARD_IDS, CONFIG, STATUS},
+=======
+    state::{PositionRange, BOARD_IDS, CONFIG, PARTICIPANTS, STATUS},
+>>>>>>> 1a15662 (bbbb)
 };
 
 use abstract_adapter::{
@@ -40,6 +44,8 @@ fn join(deps: DepsMut, adapter: Controller, sender: Addr) -> ControllerResult {
         .next()
         .ok_or(StdError::generic_err("No board found"))??;
     let start_tile_id = position_range.start();
+
+    PARTICIPANTS.save(deps.storage, &sender, &start_tile_id)?;
 
     let cannonical_sender = deps.api.addr_canonicalize(sender.as_str())?;
 

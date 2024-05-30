@@ -86,7 +86,6 @@ fn perform_action(
 
     let msgs =
         match_tile_action_to_message(tile_action, &deps, &adapter, &sender, funds, user_tile, env)?;
-        
     TEMP_USER.save(deps.storage, &info.sender)?;
     ONGOING_ACTIONS.remove(deps.storage, &info.sender);
 
