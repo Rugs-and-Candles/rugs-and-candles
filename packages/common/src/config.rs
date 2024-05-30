@@ -3,13 +3,9 @@ use crate::board::ActionType;
 use crate::board::BoardInstantiateMsg;
 use crate::board::RequiredAction;
 use crate::board::TileAction;
+use crate::controller::PositionRange;
 use cosmwasm_std::Coin;
 use cosmwasm_std::Uint128;
-#[cosmwasm_schema::cw_serde]
-pub struct PositionRange {
-    pub start: u32,
-    pub end: u32,
-}
 
 pub fn controller_boards() -> Vec<(String, PositionRange)> {
     return vec![

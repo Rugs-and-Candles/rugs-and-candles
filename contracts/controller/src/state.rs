@@ -1,4 +1,5 @@
 use abstract_adapter::objects::AccountId;
+use common::controller::{Position, PositionRange};
 use cosmwasm_std::Addr;
 use cw_storage_plus::{Item, Map};
 
@@ -7,7 +8,6 @@ use cw_storage_plus::{Item, Map};
 pub struct Config {}
 
 /// Represent the position of a user in the board.
-pub type Position = u32;
 
 /// Store the information of the contract configuration.
 pub const CONFIG: Item<Config> = Item::new("config");
@@ -19,12 +19,6 @@ pub const OWNER: Item<&Addr> = Item::new("owner");
 /// Store the information of the position of every participant in the board.
 pub const PARTICIPANTS: Map<&Addr, Position> = Map::new("participants");
 
-/// A inclusive range of positions on the board
-#[cosmwasm_schema::cw_serde]
-pub struct PositionRange {
-    pub start: Position,
-    pub end: Position,
-}
 
 /// The id of the board is represented by the name of the chain.
 pub type BoardId = String;
@@ -33,21 +27,4 @@ pub type BoardId = String;
 // pub const BOARD_IDS: Map<&BoardId, PositionRange> = Map::new("board_ids");
 pub const BOARD_IDS: Map<&str, PositionRange> = Map::new("board_ids");
 
-/// Create a new position range.
-impl PositionRange {
-    pub fn new(start: Position, end: Position) -> Self {
-        PositionRange { start, end }
-    }
 
-    pub fn start(&self) -> Position {
-        self.start
-    }
-
-    pub fn end(&self) -> Position {
-        self.end
-    }
-
-    pub fn positions(&self) -> Vec<Position> {
-        (self.start..=self.end).collect()
-    }
-}

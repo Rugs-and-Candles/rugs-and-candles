@@ -1,13 +1,13 @@
 use abstract_adapter::objects::module::ModuleInfo;
 use abstract_adapter::sdk::IbcInterface;
 use abstract_adapter::std::ibc::ModuleIbcMsg;
-use common::controller::{Controller, ControllerIbcMsg};
+use common::controller::{Controller, ControllerIbcMsg, PositionRange};
 use common::errors::ControllerError;
 use common::module_ids::BOARD_ID;
 use cosmwasm_std::{from_json, Addr, CosmosMsg, DepsMut, Env, Order, Response, StdResult};
 
 use crate::contract::ControllerResult;
-use crate::state::{PositionRange, BOARD_IDS, PARTICIPANTS};
+use crate::state::{ BOARD_IDS, PARTICIPANTS};
 
 pub fn module_ibc_handler(
     deps: DepsMut,

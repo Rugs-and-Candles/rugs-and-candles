@@ -15,7 +15,36 @@ abstract_adapter::adapter_msg_types!(Controller, ControllerExecuteMsg, Controlle
 
 /// Adapter instantiate message
 #[cosmwasm_schema::cw_serde]
-pub struct ControllerInstantiateMsg {}
+pub struct ControllerInstantiateMsg {
+    pub boards: Vec<(String, PositionRange)>,
+}
+
+/// Represent the position of a user in the board.
+pub type Position = u32;
+/// A inclusive range of positions on the board
+#[cosmwasm_schema::cw_serde]
+pub struct PositionRange {
+    pub start: Position,
+    pub end: Position,
+}
+
+impl PositionRange {
+    pub fn new(start: Position, end: Position) -> Self {
+        PositionRange { start, end }
+    }
+
+    pub fn start(&self) -> Position {
+        self.start
+    }
+
+    pub fn end(&self) -> Position {
+        self.end
+    }
+
+    pub fn positions(&self) -> Vec<Position> {
+        (self.start..=self.end).collect()
+    }
+}
 
 /// Adapter execute messages
 #[cosmwasm_schema::cw_serde]

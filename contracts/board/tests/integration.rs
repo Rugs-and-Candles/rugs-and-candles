@@ -1,30 +1,16 @@
-<<<<<<< HEAD
 use abstract_interchain_tests::setup::ibc_connect_abstract;
-=======
-use std::ops::Deref;
 
 use abstract_adapter::objects::UncheckedContractEntry;
-use abstract_adapter::std::adapter::AdapterRequestMsg;
-use abstract_interchain_tests::setup::ibc_connect_abstract;
 use abstract_interface::ExecuteMsgFns;
 use abstract_money_market_adapter::interface::MoneyMarketAdapter;
 use abstract_money_market_adapter::msg::MoneyMarketInstantiateMsg;
-use board::state::ONGOING_ACTIONS;
->>>>>>> 9f4d8063d76e2aa802530ba18fa8459302333d7d
 use board::{
     ActionType, BoardExecuteMsgFns, BoardInstantiateMsg, BoardInterface, BoardQueryMsgFns,
     RequiredAction, TileAction, RUGS_N_CANDLES_NAMESPACE,
 };
-<<<<<<< HEAD
-use common::controller::{ControllerExecuteMsgFns, ControllerInstantiateMsg};
+use common::controller::{ControllerExecuteMsgFns, ControllerInstantiateMsg, PositionRange};
 use cosmwasm_std::Api;
-=======
-use common::controller::{
-    ConfigResponse, ControllerExecuteMsg, ControllerExecuteMsgFns, ControllerInstantiateMsg,
-    ControllerQueryMsgFns,
-};
-use cosmwasm_std::{coins, from_json, Api, Decimal};
->>>>>>> 9f4d8063d76e2aa802530ba18fa8459302333d7d
+use cosmwasm_std::{coins, from_json, Decimal};
 
 use abstract_adapter::std::objects::namespace::Namespace;
 use abstract_client::{AbstractClient, Application};
@@ -68,7 +54,9 @@ impl TestEnv<MockBech32> {
             .publisher_builder(namespace.clone())
             .build()?;
         publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<_>>(
-            ControllerInstantiateMsg {},
+            ControllerInstantiateMsg { boards: vec![
+                ("kujira".to_string(), PositionRange { start: 1, end: 10 }),
+            ] },
         )?;
 
         let neutron_controller = publisher
@@ -107,18 +95,13 @@ impl TestEnv<MockBech32> {
             .account()
             .install_adapter::<BoardInterface<_>>(&[])?;
 
-<<<<<<< HEAD
-        ibc_connect_abstract(&interchain, "juno-1", "kujira-1")?;
-        ibc_connect_abstract(&interchain, "kujira-1", "juno-1")?;
-=======
         ibc_connect_abstract(&interchain, "neutron-1", "harpoon-4")?;
         ibc_connect_abstract(&interchain, "harpoon-4", "neutron-1")?;
->>>>>>> 9f4d8063d76e2aa802530ba18fa8459302333d7d
 
         println!("Installation of Controller completed");
         let sender = neutron_controller.get_chain().addr_make("testuser");
         let tx_result = neutron_controller.call_as(&sender).join()?;
-        interchain.check_ibc("juno-1", tx_result)?;
+        interchain.check_ibc("harpoon-4", tx_result)?;
 
         Ok(TestEnv {
             controller: neutron_controller,
@@ -130,13 +113,8 @@ impl TestEnv<MockBech32> {
 
 #[test]
 fn successful_install() -> anyhow::Result<()> {
-<<<<<<< HEAD
     let tiles_actions = vec![(1, TileAction::Action { action: None })];
     let env = TestEnv::setup("kujira".to_string(), tiles_actions.clone())?;
-=======
-    let tiles_actions = vec![(0, TileAction::Action { action: None })];
-    let env = TestEnv::setup("harpoon".to_string(), tiles_actions.clone())?;
->>>>>>> 9f4d8063d76e2aa802530ba18fa8459302333d7d
     let controller = env.controller;
 
     let sender = controller.get_chain().addr_make("testuser");

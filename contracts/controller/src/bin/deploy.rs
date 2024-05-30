@@ -8,8 +8,7 @@
 //!
 //! `RUST_LOG=info cargo run --bin local_daemon --features="daemon-bin" --package my-adapter`
 use common::{
-    controller::{ControllerExecuteMsg, ControllerInstantiateMsg},
-    module_ids::CONTROLLER_ID,
+    config::controller_boards, controller::{ControllerExecuteMsg, ControllerInstantiateMsg}, module_ids::CONTROLLER_ID
 };
 use controller::contract::interface::ControllerInterface;
 
@@ -55,6 +54,7 @@ fn main() -> anyhow::Result<()> {
     // Publish the Adapter to the Abstract Platform
     publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<Daemon>>(
         ControllerInstantiateMsg {
+            boards: controller_boards()
             // NOTE: The boards that are part of the game are hardcoded in the instantiate message.
         },
     )?;

@@ -7,10 +7,8 @@
 //! ```bash
 //! $ just publish uni-6 osmo-test-5
 //! ```
+use board::{BoardInstantiateMsg, BoardInterface};
 use common::module_ids::CONTROLLER_ID;
-use controller::contract::interface::ControllerInterface;
-
-use common::controller::ControllerInstantiateMsg;
 
 use abstract_adapter::objects::namespace::Namespace;
 use abstract_client::{AbstractClient, Publisher};
@@ -42,8 +40,8 @@ fn publish(networks: Vec<ChainInfo>) -> anyhow::Result<()> {
         }
 
         // Publish the Adapter to the Abstract Platform
-        publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<Daemon>>(
-            ControllerInstantiateMsg {},
+        publisher.publish_adapter::<BoardInstantiateMsg, BoardInterface<Daemon>>(
+            BoardInstantiateMsg { chain: "juno".to_string(), tiles_actions: vec![], tiles_number: 1 },
         )?;
     }
     Ok(())
