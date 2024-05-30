@@ -72,7 +72,15 @@ pub enum BoardQueryMsg {
     #[returns(ConfigResponse)]
     Config {},
     #[returns(OngoingActionResponse)]
-    OngoingAction {},
+    OngoingAction { addr: Addr },
+
+    #[returns(OngoingActionResponse)]
+    OngoingActionFromCanonical { addr: CanonicalAddr },
+    #[returns(TileActionResponse)]
+    TileAction { tile_id: u32 },
+
+    
+
 }
 
 #[cosmwasm_schema::cw_serde]
@@ -84,7 +92,15 @@ pub struct StatusResponse {
 }
 
 #[cosmwasm_schema::cw_serde]
-pub struct OngoingActionResponse {}
+pub struct OngoingActionResponse {
+    pub tile_id: u32,
+    pub action: TileAction,
+}
+
+#[cosmwasm_schema::cw_serde]
+pub struct TileActionResponse {
+    pub action: TileAction,
+}
 
 #[cosmwasm_schema::cw_serde]
 pub enum BoardIbcMsg {
