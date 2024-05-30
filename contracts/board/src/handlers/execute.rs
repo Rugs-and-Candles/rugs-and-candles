@@ -8,10 +8,7 @@ use abstract_money_market_adapter::msg::{MoneyMarketExecuteMsg, MoneyMarketQuery
 use abstract_adapter::traits::AbstractNameService;
 use abstract_adapter::{
     objects::{module::ModuleInfo, namespace::Namespace},
-    sdk::{
-        AccountVerification, Bank, IbcInterface, ModuleInterface, ModuleRegistryInterface,
-        TransferInterface,
-    },
+    sdk::{AccountVerification, IbcInterface, ModuleRegistryInterface},
     traits::AbstractResponse,
 };
 use abstract_money_market_adapter::api::MoneyMarketInterface;
@@ -21,7 +18,7 @@ use common::{
     module_ids::{CONTROLLER_ID, RUGS_N_CANDLES_NAMESPACE},
 };
 use cosmwasm_std::{
-    ensure_eq, Addr, Coin, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Reply, StdError, SubMsg,
+    ensure_eq, Addr, Coin, CosmosMsg, Deps, DepsMut, Env, MessageInfo, StdError, SubMsg,
 };
 use cw_asset::AssetBase;
 
@@ -87,9 +84,8 @@ fn perform_action(
     let sender = info.sender.clone();
     let funds = info.funds.clone();
 
-
-
-    let msgs = match_tile_action_to_message(tile_action, &deps, &adapter, &sender, funds, user_tile, env)?;
+    let msgs =
+        match_tile_action_to_message(tile_action, &deps, &adapter, &sender, funds, user_tile, env)?;
 
     ONGOING_ACTIONS.remove(deps.storage, &info.sender);
 
@@ -105,30 +101,57 @@ fn perform_action(
         .add_attribute("account_id", account_id.to_string()))
 }
 
-pub fn match_tile_action_to_message(tile_action: TileAction, deps: &DepsMut<cw_orch::prelude::Empty>, adapter: &BoardAdapter,sender: &Addr, info_funds: Vec<Coin>, user_tile: u32, env: Env) -> Result<Vec<SubMsg>, BoardError> {
+pub fn match_tile_action_to_message(
+    tile_action: TileAction,
+    deps: &DepsMut<cw_orch::prelude::Empty>,
+    adapter: &BoardAdapter,
+    sender: &Addr,
+    info_funds: Vec<Coin>,
+    user_tile: u32,
+    env: Env,
+) -> Result<Vec<SubMsg>, BoardError> {
     let msgs: Vec<SubMsg> = match tile_action {
-        TileAction::Candle { n_tile } => create_ibc_proceed_user(deps.as_ref(), adapter, sender, Some(user_tile + u32::from(n_tile)))?,
-        TileAction::Rugg { n_tile } => create_ibc_proceed_user(deps.as_ref(), adapter, sender, Some(user_tile - u32::from(n_tile)))?,
+        TileAction::Candle { n_tile } => create_ibc_proceed_user(
+            deps.as_ref(),
+            adapter,
+            sender,
+            Some(user_tile + u32::from(n_tile)),
+        )?,
+        TileAction::Rugg { n_tile } => create_ibc_proceed_user(
+            deps.as_ref(),
+            adapter,
+            sender,
+            Some(user_tile - u32::from(n_tile)),
+        )?,
         TileAction::Action { action } => {
             if let Some(action) = action {
                 let required_funds = action.required_funds;
-                let action_type = action.actions.get(0).unwrap();
-
-
+                let action_type = action.actions.first().unwrap();
 
                 match action_type {
-                    ActionType::Lend => create_lending_message(deps.as_ref(), env, adapter, sender, required_funds, info_funds)?,
+                    ActionType::Lend => create_lending_message(
+                        deps.as_ref(),
+                        env,
+                        adapter,
+                        sender,
+                        required_funds,
+                        info_funds,
+                    )?,
                 }
             } else {
                 create_ibc_proceed_user(deps.as_ref(), adapter, sender, None)?
             }
-        },
+        }
     };
     Ok(msgs)
 }
 
-
-fn create_ibc_proceed_user(deps: Deps, adapter: &BoardAdapter, user: &Addr, n_tiles: Option<u32>) -> Result<Vec<SubMsg>, BoardError> {
+fn create_ibc_proceed_user(
+    deps: Deps,
+    adapter: &BoardAdapter,
+    user: &Addr,
+    n_tiles: Option<u32>,
+) -> Result<Vec<SubMsg>, BoardError> {
     let message = adapter.ibc_client(deps).module_ibc_action(
         "neutron".to_string(),
         ModuleInfo::from_id_latest(CONTROLLER_ID)?,
@@ -149,7 +172,7 @@ fn create_lending_message(
     required_funds: Vec<Coin>,
     added_funds: Vec<Coin>,
 ) -> Result<Vec<SubMsg>, BoardError> {
-    if required_funds.len() > 1 || required_funds.len() == 0 {
+    if required_funds.len() > 1 || required_funds.is_empty() {
         return Err(BoardError::Std(StdError::generic_err(
             "Only one fund is supported",
         )));
@@ -161,7 +184,7 @@ fn create_lending_message(
         )));
     }
 
-    let first_fund = required_funds.get(0).unwrap().clone();
+    let first_fund = required_funds.first().unwrap().clone();
 
     let asset = AssetBase::native(first_fund.denom, first_fund.amount);
     let ans_asset = adapter.name_service(deps).query(&asset)?;

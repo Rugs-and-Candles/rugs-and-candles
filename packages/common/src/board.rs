@@ -107,4 +107,3 @@ pub enum BoardIbcMsg {
 pub enum BoardReplyMsg {
     Success { action: ActionType, addr: Addr },
 }
-

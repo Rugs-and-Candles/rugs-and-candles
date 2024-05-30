@@ -1,6 +1,6 @@
 use crate::{
     contract::ControllerResult,
-    state::{PositionRange, BOARD_IDS, CONFIG, STATUS},
+    state::{BOARD_IDS, CONFIG, STATUS},
 };
 
 use abstract_adapter::{
@@ -14,7 +14,6 @@ use common::{
     module_ids::{BOARD_ID, RUGS_N_CANDLES_NAMESPACE},
 };
 use cosmwasm_std::{ensure_eq, Addr, DepsMut, Env, MessageInfo, Order, StdError};
-
 
 /// Main handler of the execute messages supported by the contract.
 pub fn execute_handler(

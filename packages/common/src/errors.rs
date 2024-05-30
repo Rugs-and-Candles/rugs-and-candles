@@ -35,7 +35,6 @@ pub enum BoardError {
     Unauthorized {},
 }
 
-
 #[derive(Error, Debug, PartialEq)]
 pub enum ControllerError {
     #[error("{0}")]
@@ -62,7 +61,6 @@ pub enum ControllerError {
     #[error("Unauthorized")]
     Unauthorized {},
 }
-
 
 #[derive(Error, Debug, PartialEq)]
 pub enum ContractError {

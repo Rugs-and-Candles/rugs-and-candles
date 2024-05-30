@@ -1,4 +1,4 @@
-use abstract_adapter::objects::{chain_name::ChainName, AccountId};
+use abstract_adapter::objects::AccountId;
 use cosmwasm_std::Addr;
 use cw_storage_plus::{Item, Map};
 

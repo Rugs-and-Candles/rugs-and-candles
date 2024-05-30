@@ -1,7 +1,10 @@
 pub mod execute;
 pub mod instantiate;
+pub mod module_ibc_handler;
 pub mod query;
 pub mod reply;
-pub mod module_ibc_handler;
 
-pub use self::{execute::execute_handler, instantiate::instantiate_handler, query::query_handler, module_ibc_handler::module_ibc_handler };
+pub use self::{
+    execute::execute_handler, instantiate::instantiate_handler,
+    module_ibc_handler::module_ibc_handler, query::query_handler,
+};

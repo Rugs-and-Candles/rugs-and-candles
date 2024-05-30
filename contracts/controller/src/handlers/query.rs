@@ -1,11 +1,12 @@
 use crate::{
     contract::ControllerResult,
-    state::{Position, CONFIG, PARTICIPANTS, STATUS},
+    state::{CONFIG, PARTICIPANTS, STATUS},
 };
 
 use abstract_adapter::objects::AccountId;
 use common::controller::{
-    ConfigResponse, Controller, ControllerQueryMsg, ParticipantsResponse, StatusResponse, UserPositionResponse
+    ConfigResponse, Controller, ControllerQueryMsg, ParticipantsResponse, StatusResponse,
+    UserPositionResponse,
 };
 use cosmwasm_std::{to_json_binary, Addr, Binary, Deps, Env, Order, StdResult};
 
@@ -20,7 +21,7 @@ pub fn query_handler(
         Config {} => to_json_binary(&query_config(deps)?),
         Status { account_id } => to_json_binary(&query_status(deps, account_id)?),
         UserPosition { user_address } => to_json_binary(&query_user_position(deps, user_address)?),
-        Participants {  } => to_json_binary(&query_participants(deps)?, ),
+        Participants {} => to_json_binary(&query_participants(deps)?),
     }
     .map_err(Into::into)
 }
@@ -43,6 +44,8 @@ fn query_user_position(deps: Deps, user: String) -> StdResult<UserPositionRespon
 }
 
 fn query_participants(deps: Deps) -> StdResult<ParticipantsResponse> {
-    let participants = PARTICIPANTS.range(deps.storage, None, None, Order::Ascending).into_iter().collect::<StdResult<Vec<(Addr, u32)>>>()?;
+    let participants = PARTICIPANTS
+        .range(deps.storage, None, None, Order::Ascending)
+        .collect::<StdResult<Vec<(Addr, u32)>>>()?;
     Ok(ParticipantsResponse { participants })
 }

@@ -1,6 +1,4 @@
-use crate::{
-    BOARD_ID,
-};
+use crate::BOARD_ID;
 
 use abstract_adapter::sdk::{
     features::{AccountIdentification, Dependencies, ModuleIdentification},

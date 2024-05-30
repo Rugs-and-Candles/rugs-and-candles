@@ -1,5 +1,3 @@
-
-
 use abstract_adapter::std::ibc::ModuleIbcMsg;
 use cosmwasm_std::{DepsMut, Env, Response};
 
@@ -15,9 +13,10 @@ pub fn module_ibc_handler<Module, Error>(
 pub enum CallbackIds {
     RegisterConfirm,
 }
-impl Into<String> for CallbackIds {
-    fn into(self) -> String {
-        match self {
+
+impl From<CallbackIds> for String {
+    fn from(val: CallbackIds) -> Self {
+        match val {
             CallbackIds::RegisterConfirm => "register_confirm".to_string(),
         }
     }

@@ -44,7 +44,7 @@ pub enum ControllerQueryMsg {
     #[returns(UserPositionResponse)]
     UserPosition { user_address: String },
     #[returns(ParticipantsResponse)]
-    Participants { }
+    Participants {},
 }
 
 #[cosmwasm_schema::cw_serde]
@@ -73,4 +73,3 @@ pub enum ControllerIbcMsg {
     },
 }
 // TODO: Build handler for this message
-
