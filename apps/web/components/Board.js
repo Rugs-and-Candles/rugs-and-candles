@@ -5,7 +5,7 @@ const chainThemes = {
   stargaze: { bg: 'linear-gradient(to right, yellow, teal, green)', icon: '/icons/stargaze.png' },
   kuji: { bg: 'red.400', icon: '/icons/kuji.png' },
   juno: { bg: 'peachpuff', icon: '/icons/juno.png' },
-  archway: { bg: 'orange.500', icon: '/icons/archway.png' },
+  archway: { bg: 'yellow.300', icon: '/icons/terra.png' },
   osmosis: { bg: 'purple.500', icon: '/icons/osmosis.png' },
 };
 
@@ -30,7 +30,7 @@ const actionIcons = {
   23: 'icons/levana.png',
   28: 'icons/liquidity.png',
   32: 'icons/smart-contract.png',
-  36: 'icons/swap.png',
+  36: 'icons/steady-lads.png',
   44: 'icons/nft.png',
   50: 'icons/finish.png'
 };
