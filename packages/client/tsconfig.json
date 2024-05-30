@@ -2,9 +2,6 @@
   "extends": "@repo/typescript-config/nextjs.json",
   "compilerOptions": {
     "plugins": [
-      {
-        "name": "next"
-      }
     ],
     "strictNullChecks": true
   },

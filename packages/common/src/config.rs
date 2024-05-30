@@ -1,10 +1,10 @@
 // chainname and BoardConfig
 use crate::board::ActionType;
-use cosmwasm_std::Uint128;
-use cosmwasm_std::Coin;
+use crate::board::BoardInstantiateMsg;
 use crate::board::RequiredAction;
 use crate::board::TileAction;
-use crate::board::BoardInstantiateMsg;
+use cosmwasm_std::Coin;
+use cosmwasm_std::Uint128;
 #[cosmwasm_schema::cw_serde]
 pub struct PositionRange {
     pub start: u32,
@@ -13,11 +13,11 @@ pub struct PositionRange {
 
 pub fn controller_boards() -> Vec<(String, PositionRange)> {
     return vec![
-        ("kujira".to_string(), PositionRange { start: 1, end: 10 }),
+        ("harpoon".to_string(), PositionRange { start: 1, end: 10 }),
         ("juno".to_string(), PositionRange { start: 11, end: 20 }),
         ("osmosis".to_string(), PositionRange { start: 21, end: 30 }),
         ("terra2".to_string(), PositionRange { start: 31, end: 50 }),
-        ]
+    ];
 }
 
 pub fn board_chains_instantiate_msgs() -> Vec<(String, BoardInstantiateMsg)> {
@@ -26,7 +26,7 @@ pub fn board_chains_instantiate_msgs() -> Vec<(String, BoardInstantiateMsg)> {
         (
             "harpoon-1".to_string(),
             BoardInstantiateMsg {
-                chain: "kujira".to_string(),
+                chain: "harpoon".to_string(),
                 tiles_actions: vec![
                     (1, TileAction::Action { action: None }),
                     (2, TileAction::Candle { n_tile: 10 }),
