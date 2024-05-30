@@ -4,7 +4,7 @@ use abstract_adapter::std::adapter::AdapterRequestMsg;
 use abstract_interchain_tests::setup::ibc_connect_abstract;
 use board::state::ONGOING_ACTIONS;
 use board::{
-    ActionType, BoardInstantiateMsg, BoardInterface, RequiredAction, TileAction,
+    ActionType, BoardInstantiateMsg, BoardInterface, BoardQueryMsgFns, RequiredAction, TileAction,
     RUGS_N_CANDLES_NAMESPACE,
 };
 use common::controller::{
@@ -92,9 +92,8 @@ impl TestEnv<MockBech32> {
 #[test]
 fn successful_install() -> anyhow::Result<()> {
     let tiles_actions = vec![(0, TileAction::Action { action: None })];
-    let env = TestEnv::setup("kujira".to_string(), tiles_actions)?;
+    let env = TestEnv::setup("kujira".to_string(), tiles_actions.clone())?;
     let controller = env.controller;
-    let config = controller.config()?;
 
     let sender = controller.get_chain().addr_make("testuser");
     let sender_canonical = controller
@@ -103,26 +102,27 @@ fn successful_install() -> anyhow::Result<()> {
         .borrow()
         .api()
         .addr_canonicalize(sender.as_str())?;
-    let sender_humanized = env
-        .board
-        .get_chain()
-        .app
-        .borrow()
-        .api()
-        .addr_humanize(&sender_canonical)?;
-    let rep_unser = env
-        .board
-        .get_chain()
-        .app
-        .borrow()
-        .wrap()
-        .query_wasm_raw(
-            env.board.address()?,
-            ONGOING_ACTIONS.key(&sender_humanized).to_vec(),
-        )?
-        .unwrap();
-    let resp: u32 = from_json(rep_unser)?;
-    assert_eq!(resp, 0);
+    // let sender_humanized = env
+    //     .board
+    //     .get_chain()
+    //     .app
+    //     .borrow()
+    //     .api()
+    //     .addr_humanize(&sender_canonical)?;
+    // let rep_unser = env
+    //     .board
+    //     .get_chain()
+    //     .app
+    //     .borrow()
+    //     .wrap()
+    //     .query_wasm_raw(
+    //         env.board.address()?,
+    //         ONGOING_ACTIONS.key(&sender_humanized).to_vec(),
+    //     )?
+    //     .unwrap();
+    let resp = env.board.ongoing_action_from_canonical(sender_canonical)?;
+    assert_eq!(resp.tile_id, 0);
+    assert_eq!(resp.action, tiles_actions[0].1);
     Ok(())
 }
 

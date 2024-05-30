@@ -22,7 +22,6 @@ pub enum ActionType {
     Lend,
 }
 
-
 #[cosmwasm_schema::cw_serde]
 pub enum TileAction {
     Rugg { n_tile: u8 },
@@ -49,9 +48,7 @@ pub struct BoardInstantiateMsg {
 #[impl_into(ExecuteMsg)]
 pub enum BoardExecuteMsg {
     /// Set status of your account
-    SetStatus {
-        status: String,
-    },
+    SetStatus { status: String },
     /// Admin method: Update the configuration of the adapter
     UpdateConfig {},
     // RegisterAction {
@@ -73,14 +70,10 @@ pub enum BoardQueryMsg {
     Config {},
     #[returns(OngoingActionResponse)]
     OngoingAction { addr: Addr },
-
     #[returns(OngoingActionResponse)]
     OngoingActionFromCanonical { addr: CanonicalAddr },
     #[returns(TileActionResponse)]
     TileAction { tile_id: u32 },
-
-    
-
 }
 
 #[cosmwasm_schema::cw_serde]
@@ -104,11 +97,14 @@ pub struct TileActionResponse {
 
 #[cosmwasm_schema::cw_serde]
 pub enum BoardIbcMsg {
-    RegisterAction { user: CanonicalAddr, tile_number: u32 },
+    RegisterAction {
+        user: CanonicalAddr,
+        tile_number: u32,
+    },
 }
-
 
 #[cosmwasm_schema::cw_serde]
 pub enum BoardReplyMsg {
-    Success{ action: ActionType, addr: Addr },
+    Success { action: ActionType, addr: Addr },
 }
+
