@@ -4,7 +4,7 @@ use common::board::*;
 
 use cosmwasm_std::Response;
 
-/// The type of the result returned by your Adapter's entry points.
+/// The type of the result returned by the board adapter.
 pub type BoardResult<T = Response> = Result<T, BoardError>;
 
 const BOARD: BoardAdapter = BoardAdapter::new(BOARD_ID, BOARD_VERSION, None)
@@ -13,6 +13,7 @@ const BOARD: BoardAdapter = BoardAdapter::new(BOARD_ID, BOARD_VERSION, None)
     .with_query(handlers::query_handler)
     .with_replies(&[(0, handlers::reply::reply_handler)])
     .with_module_ibc(handlers::module_ibc_handler);
+// TODO: do we need it?
 // .with_ibc_callbacks(&[
 //     "ReplyOnBoardUpdate",
 // ]);
@@ -20,5 +21,4 @@ const BOARD: BoardAdapter = BoardAdapter::new(BOARD_ID, BOARD_VERSION, None)
 // Export handlers
 #[cfg(feature = "export")]
 abstract_adapter::export_endpoints!(BOARD, BoardAdapter);
-
 abstract_adapter::cw_orch_interface!(BOARD, BoardAdapter, BoardInstantiateMsg, BoardInterface);

@@ -4,6 +4,7 @@ pub mod module_ibc_handler;
 pub mod query;
 pub mod reply;
 
+// Re-exporting.
 pub use self::{
     execute::execute_handler, instantiate::instantiate_handler,
     module_ibc_handler::module_ibc_handler, query::query_handler,

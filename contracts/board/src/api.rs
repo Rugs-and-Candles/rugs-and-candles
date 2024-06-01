@@ -53,10 +53,7 @@ impl<'a, T: BoardApi> Board<'a, T> {
     pub fn update_config(&self) -> AbstractSdkResult<CosmosMsg> {
         self.request(BoardExecuteMsg::UpdateConfig {})
     }
-}
 
-/// Queries
-impl<'a, T: BoardApi> Board<'a, T> {
     /// Query your adapter via message type
     pub fn query<R: DeserializeOwned>(&self, query_msg: BoardQueryMsg) -> AbstractSdkResult<R> {
         let adapters = self.base.adapters(self.deps);

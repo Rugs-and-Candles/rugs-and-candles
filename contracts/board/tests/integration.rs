@@ -54,9 +54,9 @@ impl TestEnv<MockBech32> {
             .publisher_builder(namespace.clone())
             .build()?;
         publisher.publish_adapter::<ControllerInstantiateMsg, ControllerInterface<_>>(
-            ControllerInstantiateMsg { boards: vec![
-                ("kujira".to_string(), PositionRange { start: 1, end: 10 }),
-            ] },
+            ControllerInstantiateMsg {
+                boards: vec![("kujira".to_string(), PositionRange { start: 1, end: 10 })],
+            },
         )?;
 
         let neutron_controller = publisher
@@ -72,7 +72,7 @@ impl TestEnv<MockBech32> {
             },
         )?;
 
-        // MOneymarket setup
+        // Moneymarket setup
         publisher.publish_adapter::<_, MoneyMarketAdapter<_>>(MoneyMarketInstantiateMsg {
             fee: Decimal::permille(3),
             recipient_account: 0,

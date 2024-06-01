@@ -30,7 +30,7 @@ pub fn instantiate_handler(
 
     let tiles_map: HashMap<_, _> = msg.tiles_actions.into_iter().collect();
 
-    for i in 0..msg.tiles_number {
+    for i in 1..msg.tiles_number + 1 {
         match tiles_map.get(&i) {
             Some(action) => TILES.save(deps.storage, i, action)?,
             None => TILES.save(deps.storage, i, &TileAction::Action { action: None })?,

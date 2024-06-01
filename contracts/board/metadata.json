@@ -1,6 +1,6 @@
 {
-  "name": "Adapter",
-  "description": "Adapter description.",
+  "name": "Board",
+  "description": "The board represent a set of tiles for the game associated with a particular chain.",
   "website": "",
   "docs": "",
   "type": "adapter",
