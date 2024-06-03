@@ -3,6 +3,7 @@ use std::convert::TryFrom;
 
 use crate::errors::BoardError;
 
+/// Chains in which the board can be deployed.
 #[cw_serde]
 pub enum Chains {
     Neutron,

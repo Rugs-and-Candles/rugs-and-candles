@@ -8,14 +8,15 @@ use cosmwasm_std::Coin;
 use cosmwasm_std::Uint128;
 
 pub fn controller_boards() -> Vec<(String, PositionRange)> {
-    return vec![
+    vec![
         ("harpoon".to_string(), PositionRange { start: 1, end: 10 }),
         ("juno".to_string(), PositionRange { start: 11, end: 20 }),
         ("osmosis".to_string(), PositionRange { start: 21, end: 30 }),
         ("terra2".to_string(), PositionRange { start: 31, end: 50 }),
-    ];
+    ]
 }
 
+/// Helper function to define boards' state in different chains.
 pub fn board_chains_instantiate_msgs() -> Vec<(String, BoardInstantiateMsg)> {
     vec![
         //Kujira Board
@@ -34,7 +35,7 @@ pub fn board_chains_instantiate_msgs() -> Vec<(String, BoardInstantiateMsg)> {
                             action: Some(RequiredAction {
                                 required_funds: vec![Coin {
                                     denom: "ukuji".to_string(),
-                                    amount: Uint128::new(1000000),
+                                    amount: Uint128::new(1_000_000),
                                 }],
                                 actions: vec![ActionType::Lend],
                             }),
