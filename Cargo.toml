@@ -38,7 +38,7 @@ abstract-money-market-standard = { version = "0.22.0" }
 # abstract-money-market-adapter = { version = "0.22.0", default-features = false }
 
 
-cw-orch = { version = "0.22.2" }
+cw-orch = { version = "0.23.0" }
 cw-orch-interchain = { version = "0.1.0" }
 const_format = "0.2.32"
 
